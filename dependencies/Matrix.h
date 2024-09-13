@@ -72,9 +72,22 @@ std::string Matrix<T>::pretty_print() {
     return ss.str();
 }
 
+/// Overwritten operator * for matrix multiplication. Note that the matrices must satisfy mat1(MxN) and mat2(NxP)!!
+/// \tparam T Data type.
+/// \param rhs Right-hand operand.
+/// \return Result of the multiplication.
 template<class T>
 Matrix<T> Matrix<T>::operator*(Matrix<T>& rhs) {
-    // todo
+    Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
+    for (unsigned long i = 0; i < this->row; i++) {
+        for (unsigned long j = 0; j < rhs.col; j++) {
+            for (unsigned long k = 0; k < this->col; k++) {
+                T prev = mat.at_unsafe(i, j);
+                mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
+            }
+        }
+    }
+    return mat;
 }
 
 template<class T>
