@@ -15,9 +15,9 @@
 template <class T>
 class Matrix : public Stringify, public PrettyPrint {
 public:
-    unsigned long row;
-    unsigned long col;
-    unsigned long long size;
+    unsigned int row;
+    unsigned int col;
+    unsigned long size;
 
     Matrix<T> operator+(T rhs);
 
@@ -33,27 +33,31 @@ public:
 
     Matrix<T> direct_sum(Matrix<T>& rhs);
 
-    Matrix<T> reshape(unsigned long row_new, unsigned long col_new);
+    Matrix<T> reshape(unsigned int row_new, unsigned int col_new);
 
-    Matrix<T> augment(unsigned long row_new, unsigned long col_new);
+    Matrix<T> augment(unsigned int row_new, unsigned int col_new);
 
-    Matrix<T> invert(bool& error); // todo
+    Matrix<T> invert(bool& error);
 
     Matrix<T> eliminate(bool& error);
 
     Matrix<T> eliminate_rev(bool& error);
 
-    Matrix<T> pow(unsigned long n);
+    Matrix<T> pow(unsigned int n);
 
     Matrix<T> transpose();
 
-    static Matrix<T> zeros(unsigned long row_init, unsigned long col_init);
+    static Matrix<T> zeros(unsigned int row_init, unsigned int col_init);
 
-    static Matrix<T> identity(unsigned long row_init);
+    static Matrix<T> identity(unsigned int row_init);
 
     static Matrix<T> mat3(T data[3]);
 
+    static Matrix<T> mat3(T x, T y, T z);
+
     static Matrix<T> mat4(T data[4]);
+
+    static Matrix<T> mat4(T x, T y, T z, T w);
 
     static Matrix<T> from_vec3(const Vector3<T>& vec3);
 
@@ -61,13 +65,13 @@ public:
 
     Matrix<T> copy();
 
-    T at_unsafe(unsigned long row_at, unsigned long col_at);
+    T at_unsafe(unsigned int row_at, unsigned int col_at);
 
-    T at(unsigned long row_at, unsigned long col_at, bool& error);
+    T at(unsigned int row_at, unsigned int col_at, bool& error);
 
-    void set_unsafe(unsigned long row_at, unsigned long col_at, T val);
+    void set_unsafe(unsigned int row_at, unsigned int col_at, T val);
 
-    void set(unsigned long row_at, unsigned long col_at, T val, bool& error);
+    void set(unsigned int row_at, unsigned int col_at, T val, bool& error);
 
     std::string stringify() override;
 
@@ -75,7 +79,7 @@ public:
 
     Matrix();
 
-    Matrix(unsigned long row_init, unsigned long col_init, const T* data_init);
+    Matrix(unsigned int row_init, unsigned int col_init, const T* data_init);
 
     ~Matrix();
 
@@ -84,9 +88,25 @@ protected:
 };
 
 template <class T>
+Matrix<T> Matrix<T>::mat4(T x, T y, T z, T w) {
+    T data[4][1]{
+        x, y, z, w
+    };
+    return Matrix<T>::mat4(data[0]);
+}
+
+template <class T>
+Matrix<T> Matrix<T>::mat3(T x, T y, T z) {
+    T data[3][1]{
+        x, y, z
+    };
+    return Matrix<T>::mat3(data[0]);
+}
+
+template <class T>
 Matrix<T> Matrix<T>::eliminate_rev(bool& error) {
     Matrix<T> eliminated = this->copy();
-    for (long long i = eliminated.row - 1; i >= 0; i--) {
+    for (long i = eliminated.row - 1; i >= 0; i--) {
         T first_pivot = eliminated.at_unsafe(i, i);
         if (first_pivot == 0) {
             if (i - 1 >= 0) {
@@ -103,12 +123,12 @@ Matrix<T> Matrix<T>::eliminate_rev(bool& error) {
                 return Matrix();
             }
         }
-        for (long long j = i - 1; j >= 0; j--) {
+        for (long j = i - 1; j >= 0; j--) {
             T first_elem = eliminated.at_unsafe(j, i);
             long double mul = first_elem / first_pivot;
 
             eliminated.set_unsafe(j, i, 0);
-            for (long long k = eliminated.col - 1; k > j + 1; k--) {
+            for (long k = eliminated.col - 1; k > j + 1; k--) {
                 eliminated.set_unsafe(j, k, eliminated.at_unsafe(j, k) - eliminated.at_unsafe(i, k) * mul);
             }
         }
@@ -119,7 +139,7 @@ Matrix<T> Matrix<T>::eliminate_rev(bool& error) {
 template <class T>
 Matrix<T> Matrix<T>::eliminate(bool& error) {
     Matrix<T> eliminated = this->copy();
-    for (unsigned long i = 0; i < eliminated.row - 1; i++) {
+    for (unsigned int i = 0; i < eliminated.row - 1; i++) {
         T first_pivot = eliminated.at_unsafe(i, i);
         if (first_pivot == 0) {
             if (i + 1 < eliminated.row) {
@@ -136,12 +156,12 @@ Matrix<T> Matrix<T>::eliminate(bool& error) {
                 return Matrix();
             }
         }
-        for (unsigned long j = i + 1; j < eliminated.row; j++) {
+        for (unsigned int j = i + 1; j < eliminated.row; j++) {
             T first_elem = eliminated.at_unsafe(j, i);
             long double mul = first_elem / first_pivot;
 
             eliminated.set_unsafe(j, i, 0);
-            for (unsigned long k = j; k < eliminated.col; k++) {
+            for (unsigned int k = j; k < eliminated.col; k++) {
                 eliminated.set_unsafe(j, k, eliminated.at_unsafe(j, k) - eliminated.at_unsafe(i, k) * mul);
             }
         }
@@ -151,8 +171,8 @@ Matrix<T> Matrix<T>::eliminate(bool& error) {
 
 template <class T>
 Matrix<T> Matrix<T>::invert(bool& error) {
-    unsigned long r = this->row;
-    unsigned long c = this->col;
+    unsigned int r = this->row;
+    unsigned int c = this->col;
     if (r != c) {
         error = true;
         return Matrix();
@@ -160,8 +180,8 @@ Matrix<T> Matrix<T>::invert(bool& error) {
 
     Matrix<T> augmented = this->augment(r, c * 2);
     Matrix<T> id = Matrix::identity(r);
-    for (unsigned long i = 0; i < r; i++) {
-        for (unsigned long j = 0; j < c; j++) {
+    for (unsigned int i = 0; i < r; i++) {
+        for (unsigned int j = 0; j < c; j++) {
             augmented.set_unsafe(i, j + c, id.at_unsafe(i, j));
         }
     }
@@ -172,16 +192,16 @@ Matrix<T> Matrix<T>::invert(bool& error) {
 
     augmented = augmented.eliminate(error).eliminate_rev(error);
 
-    for (unsigned long i = 0; i < augmented.row; i++) {
+    for (unsigned int i = 0; i < augmented.row; i++) {
         T mul = 1 / augmented.at_unsafe(i, i);
-        for (unsigned long j = 0; j < augmented.col; j++) {
+        for (unsigned int j = 0; j < augmented.col; j++) {
             augmented.set_unsafe(i, j, augmented.at_unsafe(i, j) * mul);
         }
     }
 
     Matrix<T> inverted = Matrix::zeros(r, c);
-    for (unsigned long i = 0; i < r; i++) {
-        for (unsigned long j = 0; j < c; j++) {
+    for (unsigned int i = 0; i < r; i++) {
+        for (unsigned int j = 0; j < c; j++) {
             inverted.set_unsafe(i, j, augmented.at_unsafe(i, j + c));
         }
     }
@@ -189,22 +209,22 @@ Matrix<T> Matrix<T>::invert(bool& error) {
 }
 
 template <class T>
-Matrix<T> Matrix<T>::pow(unsigned long n) {
+Matrix<T> Matrix<T>::pow(unsigned int n) {
     Matrix init = this->copy();
     Matrix mat = this->copy();
-    for (unsigned long i = 0; i < n - 1; i++) {
+    for (unsigned int i = 0; i < n - 1; i++) {
         mat = mat * init;
     }
     return mat;
 }
 
 template <class T>
-Matrix<T> Matrix<T>::augment(unsigned long row_new, unsigned long col_new) {
+Matrix<T> Matrix<T>::augment(unsigned int row_new, unsigned int col_new) {
     row_new = row_new > this->row ? row_new : this->row;
     col_new = col_new > this->col ? col_new : this->col;
     Matrix<T> mat = Matrix::zeros(row_new, col_new);
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < this->col; j++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             mat.set_unsafe(i, j, this->at_unsafe(i, j));
         }
     }
@@ -212,9 +232,9 @@ Matrix<T> Matrix<T>::augment(unsigned long row_new, unsigned long col_new) {
 }
 
 template <class T>
-Matrix<T> Matrix<T>::identity(unsigned long row_init) {
+Matrix<T> Matrix<T>::identity(unsigned int row_init) {
     Matrix<T> mat = Matrix::zeros(row_init, row_init);
-    for (unsigned long i = 0; i< row_init; i++) {
+    for (unsigned int i = 0; i < row_init; i++) {
         mat.set_unsafe(i, i, 1);
     }
     return mat;
@@ -222,45 +242,33 @@ Matrix<T> Matrix<T>::identity(unsigned long row_init) {
 
 template <class T>
 Matrix<T> Matrix<T>::from_vec4(const Vector4<T>& vec4) {
-    T data[4] {
+    T data[4][1]{
             vec4.x, vec4.y, vec4.z, vec4.w
     };
 
-    Matrix<T> mat = Matrix<T>::zeros(4, 1);
-    for (int i = 0; i < 4; i++) {
-        mat.set_unsafe(i, 0, data[i]);
-    }
+    Matrix<T> mat = Matrix(4, 1, data[0]);
     return mat;
 }
 
 template <class T>
 Matrix<T> Matrix<T>::from_vec3(const Vector3<T>& vec3) {
-    T data[3] {
-        vec3.x, vec3.y, vec3.z
+    T data[3][1]{
+            vec3.x, vec3.y, vec3.z
     };
 
-    Matrix<T> mat = Matrix<T>::zeros(3, 1);
-    for (int i = 0; i < 3; i++) {
-        mat.set_unsafe(i, 0, data[i]);
-    }
+    Matrix<T> mat = Matrix<T>(3, 1, data[0]);
     return mat;
 }
 
 template <class T>
 Matrix<T> Matrix<T>::mat4(T* data) {
-    Matrix<T> mat = Matrix<T>::zeros(4, 1);
-    for (int i = 0; i < 4; i++) {
-        mat.set_unsafe(i, 0, data[i]);
-    }
+    Matrix<T> mat = Matrix<T>(4, 1, data);
     return mat;
 }
 
 template <class T>
 Matrix<T> Matrix<T>::mat3(T* data) {
-    Matrix<T> mat = Matrix<T>::zeros(3, 1);
-    for (int i = 0; i < 3; i++) {
-        mat.set_unsafe(i, 0, data[i]);
-    }
+    Matrix<T> mat = Matrix<T>(3, 1, data);
     return mat;
 }
 
@@ -268,9 +276,9 @@ template <class T>
 std::string Matrix<T>::pretty_print() {
     std::stringstream ss;
     ss << "[";
-    for (unsigned long i = 0; i < this->row; i++) {
+    for (unsigned int i = 0; i < this->row; i++) {
         ss << "[";
-        for (unsigned long j = 0; j < this->col; j++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             j != this->col - 1 ? ss << this->at_unsafe(i, j) << ", " : ss << this->at_unsafe(i, j);
         }
         i != this->row - 1 ? ss << "]," << std::endl : ss << "]";
@@ -286,9 +294,9 @@ std::string Matrix<T>::pretty_print() {
 template <class T>
 Matrix<T> Matrix<T>::operator*(Matrix<T>& rhs) {
     Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < rhs.col; j++) {
-            for (unsigned long k = 0; k < this->col; k++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < rhs.col; j++) {
+            for (unsigned int k = 0; k < this->col; k++) {
                 T prev = mat.at_unsafe(i, j);
                 mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
             }
@@ -301,9 +309,9 @@ template <class T>
 std::string Matrix<T>::stringify() {
     std::stringstream ss;
     ss << "[";
-    for (unsigned long i = 0; i < this->row; i++) {
+    for (unsigned int i = 0; i < this->row; i++) {
         ss << "[";
-        for (unsigned long j = 0; j < this->col; j++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             j != this->col - 1 ? ss << this->at_unsafe(i, j) << ", " : ss << this->at_unsafe(i, j);
         }
         i != this->row - 1 ? ss << "], " : ss << "]";
@@ -316,9 +324,9 @@ template <class T>
 Matrix<T> Matrix<T>::operator*(const Vector4<T>& rhs_v) {
     Matrix<T> rhs = Matrix::from_vec4(rhs_v);
     Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < rhs.col; j++) {
-            for (unsigned long k = 0; k < this->col; k++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < rhs.col; j++) {
+            for (unsigned int k = 0; k < this->col; k++) {
                 T prev = mat.at_unsafe(i, j);
                 mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
             }
@@ -331,9 +339,9 @@ template <class T>
 Matrix<T> Matrix<T>::operator*(const Vector3<T>& rhs_v) {
     Matrix<T> rhs = Matrix::from_vec3(rhs_v);
     Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < rhs.col; j++) {
-            for (unsigned long k = 0; k < this->col; k++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < rhs.col; j++) {
+            for (unsigned int k = 0; k < this->col; k++) {
                 T prev = mat.at_unsafe(i, j);
                 mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
             }
@@ -346,8 +354,8 @@ Matrix<T> Matrix<T>::operator*(const Vector3<T>& rhs_v) {
 template <class T>
 Matrix<T> Matrix<T>::transpose() {
     Matrix<T> transposed = Matrix<T>::zeros(this->col, this->row);
-    for (unsigned long i = 0; i < transposed.row; i++) {
-        for (unsigned long j = 0; j < transposed.col; j++) {
+    for (unsigned int i = 0; i < transposed.row; i++) {
+        for (unsigned int j = 0; j < transposed.col; j++) {
             transposed.set_unsafe(i, j, this->at_unsafe(j, i));
         }
     }
@@ -360,7 +368,7 @@ Matrix<T> Matrix<T>::transpose() {
 /// \param col_new q
 /// \return New matrix p×q. (original matrix if m×n != p×q!!)
 template <class T>
-Matrix<T> Matrix<T>::reshape(unsigned long row_new, unsigned long col_new) {
+Matrix<T> Matrix<T>::reshape(unsigned int row_new, unsigned int col_new) {
     if (row_new * col_new != this->size) {
         return *this;
     } else {
@@ -371,19 +379,19 @@ Matrix<T> Matrix<T>::reshape(unsigned long row_new, unsigned long col_new) {
 
 template <class T>
 Matrix<T> Matrix<T>::direct_sum(Matrix<T>& rhs) {
-    unsigned long new_row = this->row + rhs.row;
-    unsigned long new_col = this->col + rhs.col;
+    unsigned int new_row = this->row + rhs.row;
+    unsigned int new_col = this->col + rhs.col;
 
-    unsigned long offset_r = this->row;
-    unsigned long offset_c = this->col;
+    unsigned int offset_r = this->row;
+    unsigned int offset_c = this->col;
 
     Matrix<T> mat = Matrix::zeros(new_row, new_col);
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < this->col; j++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             mat.set_unsafe(i, j, this->at_unsafe(i, j));
         }
     }
-    for (unsigned long i = this->row; i < new_row; i++) {
+    for (unsigned int i = this->row; i < new_row; i++) {
         for (int j = this->col; j < new_col; j++) {
             mat.set_unsafe(i, j, rhs.at_unsafe(i - offset_r, j - offset_c));
         }
@@ -401,8 +409,8 @@ Matrix<T> Matrix<T>::operator+(Matrix<T>& rhs) {
         return *this;
     } else {
         Matrix<T> mat = this->copy();
-        for (unsigned long i = 0; i < mat->row; i++) {
-            for (unsigned long j = 0; j < mat->col; j++) {
+        for (unsigned int i = 0; i < mat->row; i++) {
+            for (unsigned int j = 0; j < mat->col; j++) {
                 mat.set_unsafe(i, j, rhs.at_unsafe(i, j));
             }
         }
@@ -413,8 +421,8 @@ Matrix<T> Matrix<T>::operator+(Matrix<T>& rhs) {
 template <class T>
 Matrix<T> Matrix<T>::operator*(T rhs) {
     Matrix<T> mat = this->copy();
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < this->col; j++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             mat.set_unsafe(i, j, this->at_unsafe(i, j) * rhs);
         }
     }
@@ -422,7 +430,7 @@ Matrix<T> Matrix<T>::operator*(T rhs) {
 }
 
 template <class T>
-void Matrix<T>::set(unsigned long row_at, unsigned long col_at, T val, bool& error) {
+void Matrix<T>::set(unsigned int row_at, unsigned int col_at, T val, bool& error) {
     if (row_at >= this->row || col_at >= this->col) {
         error = true;
         return;
@@ -433,7 +441,7 @@ void Matrix<T>::set(unsigned long row_at, unsigned long col_at, T val, bool& err
 }
 
 template <class T>
-void Matrix<T>::set_unsafe(unsigned long row_at, unsigned long col_at, T val) {
+void Matrix<T>::set_unsafe(unsigned int row_at, unsigned int col_at, T val) {
     this->data[row_at * this->col + col_at] = val;
 }
 
@@ -449,8 +457,8 @@ Matrix<T> Matrix<T>::operator+(T rhs) {
         rhs = 0;
     }
     Matrix<double> mat = this->copy();
-    for (unsigned long i = 0; i < this->row; i++) {
-        for (unsigned long j = 0; j < this->col; j++) {
+    for (unsigned int i = 0; i < this->row; i++) {
+        for (unsigned int j = 0; j < this->col; j++) {
             mat.set_unsafe(i, j, this->at_unsafe(i, j) + rhs);
         }
     }
@@ -465,12 +473,12 @@ Matrix<T> Matrix<T>::operator+(T rhs) {
 /// \param col_at
 /// \return
 template <class T>
-T Matrix<T>::at_unsafe(unsigned long row_at, unsigned long col_at) {
+T Matrix<T>::at_unsafe(unsigned int row_at, unsigned int col_at) {
     return this->data[row_at * this->col + col_at];
 }
 
 template <class T>
-T Matrix<T>::at(unsigned long row_at, unsigned long col_at, bool& error) {
+T Matrix<T>::at(unsigned int row_at, unsigned int col_at, bool& error) {
     if (row_at >= this->row || col_at >= this->col) {
         error = true;
         return NULL;
@@ -489,21 +497,21 @@ Matrix<T>::Matrix() {
 }
 
 template <class T>
-Matrix<T>::Matrix(unsigned long row_init, unsigned long col_init, const T* data_init) {
+Matrix<T>::Matrix(unsigned int row_init, unsigned int col_init, const T* data_init) {
     this->row = row_init;
     this->col = col_init;
     this->size = row_init * col_init;
 
     this->data = new T[this->size];
     T* ptr = this->data;
-    for (unsigned long i = 0; i < this->size; i++) {
+    for (unsigned int i = 0; i < this->size; i++) {
         *ptr = data_init[i];
         ptr++;
     }
 }
 
 template <class T>
-Matrix<T> Matrix<T>::zeros(unsigned long row_init, unsigned long col_init) {
+Matrix<T> Matrix<T>::zeros(unsigned int row_init, unsigned int col_init) {
     auto mat = Matrix<T>();
     mat.row = row_init;
     mat.col = col_init;
@@ -511,7 +519,7 @@ Matrix<T> Matrix<T>::zeros(unsigned long row_init, unsigned long col_init) {
 
     mat.data = new T[mat.size];
     T* ptr = mat.data;
-    for (unsigned long i = 0; i < mat.size; i++) {
+    for (unsigned int i = 0; i < mat.size; i++) {
         *ptr = 0;
         ptr++;
     }
@@ -523,5 +531,18 @@ Matrix<T>::~Matrix() {
 
 }
 
-
 #endif //RENDERER_MATRIX_H
+
+#ifndef RENDERER_MATRIX_MACRO
+#define RENDERER_MATRIX_MACRO
+
+#define mi  Matrix<int>
+#define mf  Matrix<float>
+#define md  Vector3<double>
+#define mld Vector3<long double>
+
+#define mat4f(_x, _y, _z, _w)  Matrix<float>::mat4(_x, _y, _z, _w)
+#define mat4d(_x, _y, _z, _w)  Matrix<double>::mat4(_x, _y, _z, _w)
+#define mat4ld(_x, _y, _z, _w) Matrix<long double>::mat4(_x, _y, _z, _w)
+
+#endif //RENDERER_MATRIX_MACRO
