@@ -9,8 +9,9 @@
 #include <cwchar>
 #include <sstream>
 #include "Common.h"
+#include "Vector.h"
 
-template<class T>
+template <class T>
 class Matrix : public Stringify, public PrettyPrint {
 public:
     unsigned long row;
@@ -25,6 +26,10 @@ public:
 
     Matrix<T> operator*(Matrix<T>& rhs);
 
+    Matrix<T> operator*(const Vector3<T>& rhs);
+
+    Matrix<T> operator*(const Vector4<T>& rhs);
+
     Matrix<T> direct_sum(Matrix<T>& rhs);
 
     Matrix<T> reshape(unsigned long row_new, unsigned long col_new);
@@ -32,6 +37,14 @@ public:
     Matrix<T> transpose();
 
     static Matrix<T> zeros(unsigned long row_init, unsigned long col_init);
+
+    static Matrix<T> mat3(T data[3]);
+
+    static Matrix<T> mat4(T data[4]);
+
+    static Matrix<T> from_vec3(const Vector3<T>& vec3);
+
+    static Matrix<T> from_vec4(const Vector4<T>& vec4);
 
     Matrix<T> copy();
 
@@ -57,13 +70,57 @@ protected:
     T* data;
 };
 
-template<class T>
+template <class T>
+Matrix<T> Matrix<T>::from_vec4(const Vector4<T>& vec4) {
+    T data[4] {
+            vec4.x, vec4.y, vec4.z, vec4.w
+    };
+
+    Matrix<T> mat = Matrix<T>::zeros(4, 1);
+    for (int i = 0; i < 4; i++) {
+        mat.set_unsafe(i, 0, data[i]);
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::from_vec3(const Vector3<T>& vec3) {
+    T data[3] {
+        vec3.x, vec3.y, vec3.z
+    };
+
+    Matrix<T> mat = Matrix<T>::zeros(3, 1);
+    for (int i = 0; i < 3; i++) {
+        mat.set_unsafe(i, 0, data[i]);
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::mat4(T* data) {
+    Matrix<T> mat = Matrix<T>::zeros(4, 1);
+    for (int i = 0; i < 4; i++) {
+        mat.set_unsafe(i, 0, data[i]);
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::mat3(T* data) {
+    Matrix<T> mat = Matrix<T>::zeros(3, 1);
+    for (int i = 0; i < 3; i++) {
+        mat.set_unsafe(i, 0, data[i]);
+    }
+    return mat;
+}
+
+template <class T>
 std::string Matrix<T>::pretty_print() {
     std::stringstream ss;
     ss << "[";
     for (unsigned long i = 0; i < this->row; i++) {
         ss << "[";
-        for (unsigned long j = 0; j < this->col ; j++) {
+        for (unsigned long j = 0; j < this->col; j++) {
             j != this->col - 1 ? ss << this->at_unsafe(i, j) << ", " : ss << this->at_unsafe(i, j);
         }
         i != this->row - 1 ? ss << "]," << std::endl : ss << "]";
@@ -76,7 +133,7 @@ std::string Matrix<T>::pretty_print() {
 /// \tparam T Data type.
 /// \param rhs Right-hand operand.
 /// \return Result of the multiplication.
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::operator*(Matrix<T>& rhs) {
     Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
     for (unsigned long i = 0; i < this->row; i++) {
@@ -90,13 +147,13 @@ Matrix<T> Matrix<T>::operator*(Matrix<T>& rhs) {
     return mat;
 }
 
-template<class T>
+template <class T>
 std::string Matrix<T>::stringify() {
     std::stringstream ss;
     ss << "[";
     for (unsigned long i = 0; i < this->row; i++) {
         ss << "[";
-        for (unsigned long j = 0; j < this->col ; j++) {
+        for (unsigned long j = 0; j < this->col; j++) {
             j != this->col - 1 ? ss << this->at_unsafe(i, j) << ", " : ss << this->at_unsafe(i, j);
         }
         i != this->row - 1 ? ss << "], " : ss << "]";
@@ -105,7 +162,38 @@ std::string Matrix<T>::stringify() {
     return ss.str();
 }
 
-template<class T>
+template <class T>
+Matrix<T> Matrix<T>::operator*(const Vector4<T>& rhs_v) {
+    Matrix<T> rhs = Matrix::from_vec4(rhs_v);
+    Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
+    for (unsigned long i = 0; i < this->row; i++) {
+        for (unsigned long j = 0; j < rhs.col; j++) {
+            for (unsigned long k = 0; k < this->col; k++) {
+                T prev = mat.at_unsafe(i, j);
+                mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
+            }
+        }
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::operator*(const Vector3<T>& rhs_v) {
+    Matrix<T> rhs = Matrix::from_vec3(rhs_v);
+    Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
+    for (unsigned long i = 0; i < this->row; i++) {
+        for (unsigned long j = 0; j < rhs.col; j++) {
+            for (unsigned long k = 0; k < this->col; k++) {
+                T prev = mat.at_unsafe(i, j);
+                mat.set_unsafe(i, j, this->at_unsafe(i, k) * rhs.at_unsafe(k, j) + prev);
+            }
+        }
+    }
+    return mat;
+}
+
+
+template <class T>
 Matrix<T> Matrix<T>::transpose() {
     Matrix<T> transposed = Matrix<T>::zeros(this->col, this->row);
     for (unsigned long i = 0; i < transposed.row; i++) {
@@ -121,7 +209,7 @@ Matrix<T> Matrix<T>::transpose() {
 /// \param row_new p
 /// \param col_new q
 /// \return New matrix p×q. (original matrix if m×n != p×q!!)
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::reshape(unsigned long row_new, unsigned long col_new) {
     if (row_new * col_new != this->size) {
         return *this;
@@ -131,7 +219,7 @@ Matrix<T> Matrix<T>::reshape(unsigned long row_new, unsigned long col_new) {
     }
 }
 
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::direct_sum(Matrix<T>& rhs) {
     unsigned long new_row = this->row + rhs.row;
     unsigned long new_col = this->col + rhs.col;
@@ -157,7 +245,7 @@ Matrix<T> Matrix<T>::direct_sum(Matrix<T>& rhs) {
 /// \tparam T Data type of the matrix.
 /// \param rhs Right-hand operand.
 /// \return the sum of two matrices. **(Left-hand operand if number of the rows or columns are not strictly equivalent!!)**
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::operator+(Matrix<T>& rhs) {
     if (rhs.row != this->row || rhs.col != this->col) {
         return *this;
@@ -172,7 +260,7 @@ Matrix<T> Matrix<T>::operator+(Matrix<T>& rhs) {
     }
 }
 
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::operator*(T rhs) {
     Matrix<T> mat = this->copy();
     for (unsigned long i = 0; i < this->row; i++) {
@@ -183,7 +271,7 @@ Matrix<T> Matrix<T>::operator*(T rhs) {
     return mat;
 }
 
-template<class T>
+template <class T>
 void Matrix<T>::set(unsigned long row_at, unsigned long col_at, T val, bool& error) {
     if (row_at >= this->row || col_at >= this->col) {
         error = true;
@@ -194,18 +282,18 @@ void Matrix<T>::set(unsigned long row_at, unsigned long col_at, T val, bool& err
     }
 }
 
-template<class T>
+template <class T>
 void Matrix<T>::set_unsafe(unsigned long row_at, unsigned long col_at, T val) {
     this->data[row_at * this->col + col_at] = val;
 }
 
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::copy() {
     auto mat = Matrix<T>(this->row, this->col, this->data);
     return mat;
 }
 
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::operator+(T rhs) {
     if (rhs == NULL) {
         rhs = 0;
@@ -226,12 +314,12 @@ Matrix<T> Matrix<T>::operator+(T rhs) {
 /// \param row_at
 /// \param col_at
 /// \return
-template<class T>
+template <class T>
 T Matrix<T>::at_unsafe(unsigned long row_at, unsigned long col_at) {
     return this->data[row_at * this->col + col_at];
 }
 
-template<class T>
+template <class T>
 T Matrix<T>::at(unsigned long row_at, unsigned long col_at, bool& error) {
     if (row_at >= this->row || col_at >= this->col) {
         error = true;
@@ -242,7 +330,7 @@ T Matrix<T>::at(unsigned long row_at, unsigned long col_at, bool& error) {
     }
 }
 
-template<class T>
+template <class T>
 Matrix<T>::Matrix() {
     this->row = 0;
     this->col = 0;
@@ -250,7 +338,7 @@ Matrix<T>::Matrix() {
     this->data = nullptr;
 }
 
-template<class T>
+template <class T>
 Matrix<T>::Matrix(unsigned long row_init, unsigned long col_init, const T* data_init) {
     this->row = row_init;
     this->col = col_init;
@@ -264,7 +352,7 @@ Matrix<T>::Matrix(unsigned long row_init, unsigned long col_init, const T* data_
     }
 }
 
-template<class T>
+template <class T>
 Matrix<T> Matrix<T>::zeros(unsigned long row_init, unsigned long col_init) {
     auto mat = Matrix<T>();
     mat.row = row_init;
@@ -280,7 +368,7 @@ Matrix<T> Matrix<T>::zeros(unsigned long row_init, unsigned long col_init) {
     return mat;
 }
 
-template<class T>
+template <class T>
 Matrix<T>::~Matrix() {
 
 }

@@ -25,7 +25,8 @@ ColorHSV::ColorHSV() : h(0), s(100), v(100), a(1.0) {
 
 }
 
-ColorHSV::ColorHSV(unsigned short hue, char saturation, char value, float alpha) : h(hue), s(saturation), v(value), a(alpha) {
+ColorHSV::ColorHSV(unsigned short hue, char saturation, char value, float alpha) : h(hue), s(saturation), v(value),
+                                                                                   a(alpha) {
 
 }
 
@@ -36,7 +37,7 @@ ColorHSV::ColorHSV(unsigned short hue, char saturation, char value) : ColorHSV(h
 Color ColorHSV::to_rgb() {
     Color color = Color();
     double c = v * s;
-    double x = c * (1- std::fabs((h / 60) % 2 - 1));
+    double x = c * (1 - std::fabs((h / 60) % 2 - 1));
     double m = v - c;
     double rt, gt, bt;
 
@@ -78,7 +79,8 @@ ColorHSL::ColorHSL() : h(0), s(100), l(100), a(1.0) {
 
 }
 
-ColorHSL::ColorHSL(unsigned short hue, char saturation, char lightness, float alpha) : h(hue), s(saturation), l(lightness), a(alpha) {
+ColorHSL::ColorHSL(unsigned short hue, char saturation, char lightness, float alpha) : h(hue), s(saturation),
+                                                                                       l(lightness), a(alpha) {
 
 }
 

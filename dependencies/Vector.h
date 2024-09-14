@@ -7,7 +7,7 @@
 
 #include "Common.h"
 
-template<class T>
+template <class T>
 class Vector : public Stringify {
 /*
     friend T dot_prod(const Vector<T>& lhs, const Vector<T>& rhs);
@@ -37,7 +37,7 @@ public:
     std::string stringify() override = 0;
 };
 
-template<class T>
+template <class T>
 class Vector3 : public Stringify {
     friend T dot_prod(const Vector3<T>& lhs, const Vector3<T>& rhs);
 
@@ -83,7 +83,7 @@ public:
     ~Vector3();
 };
 
-template<class T>
+template <class T>
 class Vector4 : public Stringify {
     friend T dot_prod(const Vector4<T>& lhs, const Vector4<T>& rhs);
 
@@ -126,21 +126,11 @@ public:
     ~Vector4();
 };
 
-template<class T>
-T dot_prod(const Vector4<T>& lhs, const Vector4<T>& rhs) {
-    return static_cast<T>(
-            lhs.x * rhs.x +
-            lhs.y * rhs.y +
-            lhs.z * rhs.z +
-            lhs.w * rhs.w
-    );
-}
-
 #include <cmath>
 #include <sstream>
 
 // implementation for vector3
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::operator-(const Vector3<T>& rhs) {
     auto v3 = Vector3();
     v3.x = this->x - rhs.x;
@@ -149,7 +139,7 @@ Vector3<T> Vector3<T>::operator-(const Vector3<T>& rhs) {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::operator-() {
     auto v3 = Vector3();
     v3.x = -this->x;
@@ -158,7 +148,7 @@ Vector3<T> Vector3<T>::operator-() {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::operator+(const Vector3<T>& rhs) {
     auto v3 = Vector3();
     v3.x = this->x + rhs.x;
@@ -167,7 +157,7 @@ Vector3<T> Vector3<T>::operator+(const Vector3<T>& rhs) {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::copy() {
     auto v3 = Vector3<T>();
     v3.x = static_cast<T>(this->x);
@@ -176,7 +166,7 @@ Vector3<T> Vector3<T>::copy() {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T> const_copy(const Vector3<T>& op) {
     auto v3 = Vector3<T>();
     v3.x = static_cast<T>(op.x);
@@ -185,30 +175,30 @@ Vector3<T> const_copy(const Vector3<T>& op) {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T>::~Vector3() = default;
 
-template<class T>
+template <class T>
 Vector3<T>::Vector3(T x, T y, T z) {
     this->x = static_cast<T>(x);
     this->y = static_cast<T>(y);
     this->z = static_cast<T>(z);
 }
 
-template<class T>
+template <class T>
 Vector3<T>::Vector3() {
     this->x = static_cast<T>(0);
     this->y = static_cast<T>(0);
     this->z = static_cast<T>(0);
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::operator+() {
     return this->copy();
 }
 
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::normalize() {
     T mul = 1 / mod(*this);
     auto v3 = Vector3<T>();
@@ -218,7 +208,7 @@ Vector3<T> Vector3<T>::normalize() {
     return v3;
 }
 
-template<class T>
+template <class T>
 T Vector3<T>::mod() {
     return static_cast<T>(
             sqrtl(
@@ -231,7 +221,7 @@ T Vector3<T>::mod() {
     );
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::cross_prod(const Vector3<T>& rhs) {
     auto vec3 = Vector3<T>();
     vec3.x = this->y * rhs.z - this->z * rhs.y;
@@ -240,7 +230,7 @@ Vector3<T> Vector3<T>::cross_prod(const Vector3<T>& rhs) {
     return vec3;
 }
 
-template<class T>
+template <class T>
 T Vector3<T>::dot_prod(const Vector3<T>& rhs) {
     return static_cast<T>(
             this->x * rhs.x +
@@ -249,7 +239,7 @@ T Vector3<T>::dot_prod(const Vector3<T>& rhs) {
     );
 }
 
-template<class T>
+template <class T>
 Vector3<T> Vector3<T>::operator*(T rhs) {
     auto v3 = Vector3<T>();
     v3.x = this->x * rhs;
@@ -258,7 +248,7 @@ Vector3<T> Vector3<T>::operator*(T rhs) {
     return v3;
 }
 
-template<class T>
+template <class T>
 Vector3<T> normalize(const Vector3<T>& op) {
     T mul = 1 / mod(op);
     auto v3 = Vector3<T>();
@@ -268,7 +258,7 @@ Vector3<T> normalize(const Vector3<T>& op) {
     return v3;
 }
 
-template<class T>
+template <class T>
 T mod(const Vector3<T>& op) {
     return static_cast<T>(
             sqrtl(
@@ -281,7 +271,7 @@ T mod(const Vector3<T>& op) {
     );
 }
 
-template<class T>
+template <class T>
 Vector3<T> cross_prod(const Vector3<T>& lhs, const Vector3<T>& rhs) {
     auto vec3 = Vector3<T>();
     vec3.x = lhs.y * rhs.z - lhs.z * rhs.y;
@@ -290,7 +280,7 @@ Vector3<T> cross_prod(const Vector3<T>& lhs, const Vector3<T>& rhs) {
     return vec3;
 }
 
-template<class T>
+template <class T>
 T dot_prod(const Vector3<T>& lhs, const Vector3<T>& rhs) {
     return static_cast<T>(
             lhs.x * rhs.x +
@@ -300,7 +290,7 @@ T dot_prod(const Vector3<T>& lhs, const Vector3<T>& rhs) {
 }
 
 
-template<class T>
+template <class T>
 std::string Vector3<T>::stringify() {
     std::stringstream ss;
     ss << "Vector3(";
@@ -309,12 +299,12 @@ std::string Vector3<T>::stringify() {
 }
 
 // implementation for vector4
-template<class T>
+template <class T>
 Vector4<T> Vector4<T>::operator-(const Vector4<T>& rhs) {
     return (*this) + (-rhs);
 }
 
-template<class T>
+template <class T>
 Vector4<T> Vector4<T>::operator-() {
     auto v4 = Vector4();
     v4.x = -this->x;
@@ -324,7 +314,7 @@ Vector4<T> Vector4<T>::operator-() {
     return v4;
 }
 
-template<class T>
+template <class T>
 Vector4<T>::Vector4(T x, T y, T z, T w) {
     this->x = static_cast<T>(x);
     this->y = static_cast<T>(y);
@@ -332,10 +322,10 @@ Vector4<T>::Vector4(T x, T y, T z, T w) {
     this->w = static_cast<T>(w);
 }
 
-template<class T>
+template <class T>
 Vector4<T>::~Vector4() = default;
 
-template<class T>
+template <class T>
 Vector4<T>::Vector4() {
     this->x = 0;
     this->y = 0;
@@ -343,7 +333,7 @@ Vector4<T>::Vector4() {
     this->w = 0;
 }
 
-template<class T>
+template <class T>
 Vector4<T> Vector4<T>::operator+(const Vector4<T>& rhs) {
     auto v4 = Vector4();
     v4.x = this->x + rhs.x;
@@ -353,7 +343,7 @@ Vector4<T> Vector4<T>::operator+(const Vector4<T>& rhs) {
     return v4;
 }
 
-template<class T>
+template <class T>
 Vector4<T> Vector4<T>::copy() {
     auto v4 = Vector4();
     v4.x = this->x;
@@ -363,9 +353,100 @@ Vector4<T> Vector4<T>::copy() {
     return v4;
 }
 
-template<class T>
+template <class T>
 Vector4<T> Vector4<T>::operator+() {
     return this->copy();
+}
+
+template <class T>
+T Vector4<T>::mod() {
+    return static_cast<T>(
+            sqrtl(
+                    static_cast<long double>(
+                            powl(this->x, 2) +
+                            powl(this->y, 2) +
+                            powl(this->z, 2) +
+                            powl(this->w, 2)
+                    )
+            )
+    );
+}
+
+template <class T>
+T mod(const Vector4<T>& op) {
+    return static_cast<T>(
+            sqrtl(
+                    static_cast<long double>(
+                            powl(op.x, 2) +
+                            powl(op.y, 2) +
+                            powl(op.z, 2) +
+                            powl(op.w, 2)
+                    )
+            )
+    );
+}
+
+template <class T>
+T Vector4<T>::dot_prod(const Vector4<T>& rhs) {
+    return static_cast<T>(
+            this->x * rhs.x +
+            this->y * rhs.y +
+            this->z * rhs.z +
+            this->w * rhs.w
+    );
+}
+
+template <class T>
+Vector4<T> Vector4<T>::operator*(T rhs) {
+    Vector4<T> v4 = Vector4<T>();
+    v4.x = this->x * rhs;
+    v4.y = this->y * rhs;
+    v4.z = this->z * rhs;
+    v4.w = this->w * rhs;
+    return v4;
+}
+
+template <class T>
+T dot_prod(const Vector4<T>& lhs, const Vector4<T>& rhs) {
+    return static_cast<T>(
+            lhs.x * rhs.x +
+            lhs.y * rhs.y +
+            lhs.z * rhs.z +
+            lhs.w * rhs.w
+    );
+}
+
+
+template <class T>
+Vector4<T> normalize(const Vector4<T>& op) {
+    T mul = 1 / mod(op);
+    auto v4 = Vector4<T>();
+    v4.x = op.x * mul;
+    v4.y = op.y * mul;
+    v4.z = op.z * mul;
+    v4.w = op.w * mul;
+    return v4;
+}
+
+template <class T>
+Vector4<T> Vector4<T>::normalize() {
+    T mul = 1 / mod(*this);
+    auto v4 = Vector4<T>();
+    v4.x = this->x * mul;
+    v4.y = this->y * mul;
+    v4.z = this->z * mul;
+    v4.w = this->w * mul;
+    return v4;
+}
+
+template <class T>
+Vector4<T> Vector4<T>::cross_prod(const Vector4<T>& rhs) {
+    // todo
+}
+
+template <class T>
+Vector4<T> cross_prod(const Vector4<T>& lhs, const Vector4<T>& rhs) {
+    // todo
 }
 
 #endif //RENDERER_VECTOR_H

@@ -15,8 +15,11 @@ public:
     float a;
 
     Color(char red, char green, char blue, float alpha);
+
     Color(char red, char green, char blue);
+
     ~Color();
+
     Color();
 };
 
@@ -35,8 +38,11 @@ public:
     Color to_rgb() override;
 
     ColorHSV();
+
     ColorHSV(unsigned short hue, char saturation, char value, float alpha);
+
     ColorHSV(unsigned short hue, char saturation, char value);
+
     ~ColorHSV();
 };
 
@@ -50,8 +56,11 @@ public:
     Color to_rgb() override;
 
     ColorHSL();
+
     ColorHSL(unsigned short hue, char saturation, char lightness, float alpha);
+
     ColorHSL(unsigned short hue, char saturation, char lightness);
+
     ~ColorHSL();
 };
 
