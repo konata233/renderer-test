@@ -8,6 +8,7 @@
 
 #include <cwchar>
 #include <sstream>
+#include <iostream>
 #include "Common.h"
 #include "Vector.h"
 
@@ -34,9 +35,21 @@ public:
 
     Matrix<T> reshape(unsigned long row_new, unsigned long col_new);
 
+    Matrix<T> augment(unsigned long row_new, unsigned long col_new);
+
+    Matrix<T> invert(bool& error); // todo
+
+    Matrix<T> eliminate(bool& error);
+
+    Matrix<T> eliminate_rev(bool& error);
+
+    Matrix<T> pow(unsigned long n);
+
     Matrix<T> transpose();
 
     static Matrix<T> zeros(unsigned long row_init, unsigned long col_init);
+
+    static Matrix<T> identity(unsigned long row_init);
 
     static Matrix<T> mat3(T data[3]);
 
@@ -69,6 +82,143 @@ public:
 protected:
     T* data;
 };
+
+template <class T>
+Matrix<T> Matrix<T>::eliminate_rev(bool& error) {
+    Matrix<T> eliminated = this->copy();
+    for (long long i = eliminated.row - 1; i >= 0; i--) {
+        T first_pivot = eliminated.at_unsafe(i, i);
+        if (first_pivot == 0) {
+            if (i - 1 >= 0) {
+                T replace = eliminated.at_unsafe(i - 1, i);
+                if (replace == 0) {
+                    error = true;
+                    return Matrix();
+                } else {
+                    eliminated.set_unsafe(i - 1, i, 0);
+                    eliminated.set_unsafe(i, i, replace);
+                }
+            } else {
+                error = true;
+                return Matrix();
+            }
+        }
+        for (long long j = i - 1; j >= 0; j--) {
+            T first_elem = eliminated.at_unsafe(j, i);
+            long double mul = first_elem / first_pivot;
+
+            eliminated.set_unsafe(j, i, 0);
+            for (long long k = eliminated.col - 1; k > j + 1; k--) {
+                eliminated.set_unsafe(j, k, eliminated.at_unsafe(j, k) - eliminated.at_unsafe(i, k) * mul);
+            }
+        }
+    }
+    return eliminated;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::eliminate(bool& error) {
+    Matrix<T> eliminated = this->copy();
+    for (unsigned long i = 0; i < eliminated.row - 1; i++) {
+        T first_pivot = eliminated.at_unsafe(i, i);
+        if (first_pivot == 0) {
+            if (i + 1 < eliminated.row) {
+                T replace = eliminated.at_unsafe(i + 1, i);
+                if (replace == 0) {
+                    error = true;
+                    return Matrix();
+                } else {
+                    eliminated.set_unsafe(i + 1, i, 0);
+                    eliminated.set_unsafe(i, i, replace);
+                }
+            } else {
+                error = true;
+                return Matrix();
+            }
+        }
+        for (unsigned long j = i + 1; j < eliminated.row; j++) {
+            T first_elem = eliminated.at_unsafe(j, i);
+            long double mul = first_elem / first_pivot;
+
+            eliminated.set_unsafe(j, i, 0);
+            for (unsigned long k = j; k < eliminated.col; k++) {
+                eliminated.set_unsafe(j, k, eliminated.at_unsafe(j, k) - eliminated.at_unsafe(i, k) * mul);
+            }
+        }
+    }
+    return eliminated;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::invert(bool& error) {
+    unsigned long r = this->row;
+    unsigned long c = this->col;
+    if (r != c) {
+        error = true;
+        return Matrix();
+    }
+
+    Matrix<T> augmented = this->augment(r, c * 2);
+    Matrix<T> id = Matrix::identity(r);
+    for (unsigned long i = 0; i < r; i++) {
+        for (unsigned long j = 0; j < c; j++) {
+            augmented.set_unsafe(i, j + c, id.at_unsafe(i, j));
+        }
+    }
+
+    if (error) {
+        return Matrix();
+    }
+
+    augmented = augmented.eliminate(error).eliminate_rev(error);
+
+    for (unsigned long i = 0; i < augmented.row; i++) {
+        T mul = 1 / augmented.at_unsafe(i, i);
+        for (unsigned long j = 0; j < augmented.col; j++) {
+            augmented.set_unsafe(i, j, augmented.at_unsafe(i, j) * mul);
+        }
+    }
+
+    Matrix<T> inverted = Matrix::zeros(r, c);
+    for (unsigned long i = 0; i < r; i++) {
+        for (unsigned long j = 0; j < c; j++) {
+            inverted.set_unsafe(i, j, augmented.at_unsafe(i, j + c));
+        }
+    }
+    return inverted;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::pow(unsigned long n) {
+    Matrix init = this->copy();
+    Matrix mat = this->copy();
+    for (unsigned long i = 0; i < n - 1; i++) {
+        mat = mat * init;
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::augment(unsigned long row_new, unsigned long col_new) {
+    row_new = row_new > this->row ? row_new : this->row;
+    col_new = col_new > this->col ? col_new : this->col;
+    Matrix<T> mat = Matrix::zeros(row_new, col_new);
+    for (unsigned long i = 0; i < this->row; i++) {
+        for (unsigned long j = 0; j < this->col; j++) {
+            mat.set_unsafe(i, j, this->at_unsafe(i, j));
+        }
+    }
+    return mat;
+}
+
+template <class T>
+Matrix<T> Matrix<T>::identity(unsigned long row_init) {
+    Matrix<T> mat = Matrix::zeros(row_init, row_init);
+    for (unsigned long i = 0; i< row_init; i++) {
+        mat.set_unsafe(i, i, 1);
+    }
+    return mat;
+}
 
 template <class T>
 Matrix<T> Matrix<T>::from_vec4(const Vector4<T>& vec4) {

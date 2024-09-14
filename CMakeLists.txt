@@ -11,4 +11,6 @@ add_executable(renderer main.cpp
         dependencies/Common.cpp
         dependencies/Common.h
         dependencies/Color.cpp
-        dependencies/Color.h)
+        dependencies/Color.h
+        dependencies/Transform.cpp
+        dependencies/Transform.h)
