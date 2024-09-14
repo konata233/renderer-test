@@ -64,6 +64,8 @@ public:
 
     Vector3<T> operator*(T rhs);
 
+    Vector3<T> operator^(const Vector3<T>& rhs);
+
     Vector3<T> copy();
 
     T dot_prod(const Vector3<T>& rhs);
@@ -82,6 +84,11 @@ public:
 
     ~Vector3();
 };
+
+template <class T>
+Vector3<T> Vector3<T>::operator^(const Vector3<T>& rhs) {
+    return this->cross_prod(rhs);
+}
 
 template <class T>
 class Vector4 : public Stringify {
@@ -118,6 +125,8 @@ public:
     T mod();
 
     Vector4<T> normalize();
+
+    std::string stringify() override;
 
     Vector4();
 
@@ -447,6 +456,14 @@ Vector4<T> Vector4<T>::cross_prod(const Vector4<T>& rhs) {
 template <class T>
 Vector4<T> cross_prod(const Vector4<T>& lhs, const Vector4<T>& rhs) {
     // todo
+}
+
+template <class T>
+std::string Vector4<T>::stringify() {
+    std::stringstream ss;
+    ss << "Vector4(";
+    ss << this->x << ", " << this->y << ", " << this->z << ", " << this->w << ")";
+    return ss.str();
 }
 
 #endif //RENDERER_VECTOR_H
