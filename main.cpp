@@ -24,16 +24,17 @@ int main() {
             {0, 3, 2},
             {6, 1, 5},
     };
-    double arr2[2][3] {
-            {1, 2, 0},
-            {3,1, 4}
+    double arr2[3][3] {
+            {1, 2, 1},
+            {3,8, 5},
+            {4, 9, 7}
     };
     auto mat = Matrix<double>(2, 3, arr[0]);
-    auto mat2 = Matrix<double>(2, 3, arr2[0]);
+    auto mat2 = Matrix<double>(3, 3, arr2[0]);
+    auto mul = mat * mat2;
     std::cout << mat.stringify() << std::endl;
     std::cout << mat.transpose().stringify() << std::endl;
-    std::cout << mat2.pretty_print() << std::endl;
-    std::cout << mat2.transpose().pretty_print() << std::endl;
+    std::cout << mul.pretty_print();
     /*
     int l, l2;
     std::cin >> l >> l2;

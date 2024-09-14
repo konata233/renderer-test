@@ -9,4 +9,6 @@ add_executable(renderer main.cpp
         dependencies/Matrix.cpp
         dependencies/Matrix.h
         dependencies/Common.cpp
-        dependencies/Common.h)
+        dependencies/Common.h
+        dependencies/Color.cpp
+        dependencies/Color.h)

@@ -7,6 +7,7 @@
 
 
 #include <string>
+#include "Color.h"
 
 class Stringify {
 public:

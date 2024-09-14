@@ -201,8 +201,8 @@ void Matrix<T>::set_unsafe(unsigned long row_at, unsigned long col_at, T val) {
 
 template<class T>
 Matrix<T> Matrix<T>::copy() {
-    auto* mat = new Matrix<T>(this->row, this->col, this->data);
-    return *mat;
+    auto mat = Matrix<T>(this->row, this->col, this->data);
+    return mat;
 }
 
 template<class T>
@@ -219,13 +219,16 @@ Matrix<T> Matrix<T>::operator+(T rhs) {
     return mat;
 }
 
+/// Get the value of designated position in the matrix (unsafe).
+/// Note that though this method may have potential risk of undefined op,
+/// it can be faster than Matrix<T>::at(), see also: NRVO mechanism of cpp 11.
+/// \tparam T
+/// \param row_at
+/// \param col_at
+/// \return
 template<class T>
 T Matrix<T>::at_unsafe(unsigned long row_at, unsigned long col_at) {
-    if (row_at >= this->row || col_at >= this->col) {
-        return NULL;
-    } else {
-        return this->data[row_at * this->col + col_at];
-    }
+    return this->data[row_at * this->col + col_at];
 }
 
 template<class T>
@@ -263,18 +266,18 @@ Matrix<T>::Matrix(unsigned long row_init, unsigned long col_init, const T* data_
 
 template<class T>
 Matrix<T> Matrix<T>::zeros(unsigned long row_init, unsigned long col_init) {
-    auto* mat = new Matrix<T>;
-    mat->row = row_init;
-    mat->col = col_init;
-    mat->size = row_init * col_init;
+    auto mat = Matrix<T>();
+    mat.row = row_init;
+    mat.col = col_init;
+    mat.size = row_init * col_init;
 
-    mat->data = new T[mat->size];
-    T* ptr = mat->data;
-    for (unsigned long i = 0; i < mat->size; i++) {
+    mat.data = new T[mat.size];
+    T* ptr = mat.data;
+    for (unsigned long i = 0; i < mat.size; i++) {
         *ptr = 0;
         ptr++;
     }
-    return *mat;
+    return mat;
 }
 
 template<class T>

@@ -142,47 +142,47 @@ T dot_prod(const Vector4<T>& lhs, const Vector4<T>& rhs) {
 // implementation for vector3
 template<class T>
 Vector3<T> Vector3<T>::operator-(const Vector3<T>& rhs) {
-    auto* v3 = new Vector3;
-    v3->x = this->x - rhs.x;
-    v3->y = this->y - rhs.y;
-    v3->z = this->z - rhs.z;
-    return *v3;
+    auto v3 = Vector3();
+    v3.x = this->x - rhs.x;
+    v3.y = this->y - rhs.y;
+    v3.z = this->z - rhs.z;
+    return v3;
 }
 
 template<class T>
 Vector3<T> Vector3<T>::operator-() {
-    auto* v3 = new Vector3;
-    v3->x = -this->x;
-    v3->y = -this->y;
-    v3->z = -this->z;
-    return *v3;
+    auto v3 = Vector3();
+    v3.x = -this->x;
+    v3.y = -this->y;
+    v3.z = -this->z;
+    return v3;
 }
 
 template<class T>
 Vector3<T> Vector3<T>::operator+(const Vector3<T>& rhs) {
-    auto* v3 = new Vector3;
-    v3->x = this->x + rhs.x;
-    v3->y = this->y + rhs.y;
-    v3->z = this->z + rhs.z;
-    return *v3;
+    auto v3 = Vector3();
+    v3.x = this->x + rhs.x;
+    v3.y = this->y + rhs.y;
+    v3.z = this->z + rhs.z;
+    return v3;
 }
 
 template<class T>
 Vector3<T> Vector3<T>::copy() {
-    auto* v3 = new Vector3<T>;
-    v3->x = static_cast<T>(this->x);
-    v3->y = static_cast<T>(this->y);
-    v3->z = static_cast<T>(this->z);
-    return *v3;
+    auto v3 = Vector3<T>();
+    v3.x = static_cast<T>(this->x);
+    v3.y = static_cast<T>(this->y);
+    v3.z = static_cast<T>(this->z);
+    return v3;
 }
 
 template<class T>
 Vector3<T> const_copy(const Vector3<T>& op) {
-    auto* v3 = new Vector3<T>;
-    v3->x = static_cast<T>(op.x);
-    v3->y = static_cast<T>(op.y);
-    v3->z = static_cast<T>(op.z);
-    return *v3;
+    auto v3 = Vector3<T>();
+    v3.x = static_cast<T>(op.x);
+    v3.y = static_cast<T>(op.y);
+    v3.z = static_cast<T>(op.z);
+    return v3;
 }
 
 template<class T>
@@ -211,11 +211,11 @@ Vector3<T> Vector3<T>::operator+() {
 template<class T>
 Vector3<T> Vector3<T>::normalize() {
     T mul = 1 / mod(*this);
-    auto* v3 = new Vector3<T>;
-    v3->x = this->x * mul;
-    v3->y = this->y * mul;
-    v3->z = this->z * mul;
-    return *v3;
+    auto v3 = Vector3<T>();
+    v3.x = this->x * mul;
+    v3.y = this->y * mul;
+    v3.z = this->z * mul;
+    return v3;
 }
 
 template<class T>
@@ -233,11 +233,11 @@ T Vector3<T>::mod() {
 
 template<class T>
 Vector3<T> Vector3<T>::cross_prod(const Vector3<T>& rhs) {
-    auto* vec3 = new Vector3<T>;
-    vec3->x = this->y * rhs.z - this->z * rhs.y;
-    vec3->y = this->z * rhs.x - this->x * rhs.z;
-    vec3->z = this->x * rhs.y - this->y * rhs.x;
-    return *vec3;
+    auto vec3 = Vector3<T>();
+    vec3.x = this->y * rhs.z - this->z * rhs.y;
+    vec3.y = this->z * rhs.x - this->x * rhs.z;
+    vec3.z = this->x * rhs.y - this->y * rhs.x;
+    return vec3;
 }
 
 template<class T>
@@ -251,21 +251,21 @@ T Vector3<T>::dot_prod(const Vector3<T>& rhs) {
 
 template<class T>
 Vector3<T> Vector3<T>::operator*(T rhs) {
-    auto v3 = new Vector3<T>;
-    v3->x = this->x * rhs;
-    v3->y = this->y * rhs;
-    v3->z = this->z * rhs;
-    return *v3;
+    auto v3 = Vector3<T>();
+    v3.x = this->x * rhs;
+    v3.y = this->y * rhs;
+    v3.z = this->z * rhs;
+    return v3;
 }
 
 template<class T>
 Vector3<T> normalize(const Vector3<T>& op) {
     T mul = 1 / mod(op);
-    auto* v3 = new Vector3<T>;
-    v3->x = op.x * mul;
-    v3->y = op.y * mul;
-    v3->z = op.z * mul;
-    return *v3;
+    auto v3 = Vector3<T>();
+    v3.x = op.x * mul;
+    v3.y = op.y * mul;
+    v3.z = op.z * mul;
+    return v3;
 }
 
 template<class T>
@@ -283,11 +283,11 @@ T mod(const Vector3<T>& op) {
 
 template<class T>
 Vector3<T> cross_prod(const Vector3<T>& lhs, const Vector3<T>& rhs) {
-    auto* vec3 = new Vector3<T>;
-    vec3->x = lhs.y * rhs.z - lhs.z * rhs.y;
-    vec3->y = lhs.z * rhs.x - lhs.x * rhs.z;
-    vec3->z = lhs.x * rhs.y - lhs.y * rhs.x;
-    return *vec3;
+    auto vec3 = Vector3<T>();
+    vec3.x = lhs.y * rhs.z - lhs.z * rhs.y;
+    vec3.y = lhs.z * rhs.x - lhs.x * rhs.z;
+    vec3.z = lhs.x * rhs.y - lhs.y * rhs.x;
+    return vec3;
 }
 
 template<class T>
@@ -316,12 +316,12 @@ Vector4<T> Vector4<T>::operator-(const Vector4<T>& rhs) {
 
 template<class T>
 Vector4<T> Vector4<T>::operator-() {
-    auto* v4 = new Vector4;
-    v4->x = -this->x;
-    v4->y = -this->y;
-    v4->z = -this->z;
-    v4->w = -this->w;
-    return *v4;
+    auto v4 = Vector4();
+    v4.x = -this->x;
+    v4.y = -this->y;
+    v4.z = -this->z;
+    v4.w = -this->w;
+    return v4;
 }
 
 template<class T>
@@ -345,22 +345,22 @@ Vector4<T>::Vector4() {
 
 template<class T>
 Vector4<T> Vector4<T>::operator+(const Vector4<T>& rhs) {
-    auto* v4 = new Vector4;
-    v4->x = this->x + rhs.x;
-    v4->y = this->y + rhs.y;
-    v4->z = this->z + rhs.z;
-    v4->w = this->w + rhs.w;
-    return *v4;
+    auto v4 = Vector4();
+    v4.x = this->x + rhs.x;
+    v4.y = this->y + rhs.y;
+    v4.z = this->z + rhs.z;
+    v4.w = this->w + rhs.w;
+    return v4;
 }
 
 template<class T>
 Vector4<T> Vector4<T>::copy() {
-    auto* v4 = new Vector4;
-    v4->x = this->x;
-    v4->y = this->y;
-    v4->z = this->z;
-    v4->w = this->w;
-    return *v4;
+    auto v4 = Vector4();
+    v4.x = this->x;
+    v4.y = this->y;
+    v4.z = this->z;
+    v4.w = this->w;
+    return v4;
 }
 
 template<class T>
