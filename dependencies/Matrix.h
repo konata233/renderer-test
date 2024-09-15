@@ -23,9 +23,9 @@ public:
 
     Matrix<T> operator*(T rhs);
 
-    Matrix<T> operator+(Matrix<T>& rhs);
+    Matrix<T> operator+(const Matrix<T>& rhs);
 
-    Matrix<T> operator*(Matrix<T>& rhs);
+    Matrix<T> operator*(const Matrix<T>& rhs);
 
     Matrix<T> operator*(const Vector3<T>& rhs);
 
@@ -65,9 +65,9 @@ public:
 
     Matrix<T> copy();
 
-    T at_unsafe(unsigned int row_at, unsigned int col_at);
+    T at_unsafe(unsigned int row_at, unsigned int col_at) const; // NOLINT(*-use-nodiscard)
 
-    T at(unsigned int row_at, unsigned int col_at, bool& error);
+    T at(unsigned int row_at, unsigned int col_at, bool& error) const;
 
     void set_unsafe(unsigned int row_at, unsigned int col_at, T val);
 
@@ -90,7 +90,7 @@ protected:
 template <class T>
 Matrix<T> Matrix<T>::mat4(T x, T y, T z, T w) {
     T data[4][1]{
-        x, y, z, w
+            x, y, z, w
     };
     return Matrix<T>::mat4(data[0]);
 }
@@ -98,7 +98,7 @@ Matrix<T> Matrix<T>::mat4(T x, T y, T z, T w) {
 template <class T>
 Matrix<T> Matrix<T>::mat3(T x, T y, T z) {
     T data[3][1]{
-        x, y, z
+            x, y, z
     };
     return Matrix<T>::mat3(data[0]);
 }
@@ -292,7 +292,7 @@ std::string Matrix<T>::pretty_print() {
 /// \param rhs Right-hand operand.
 /// \return Result of the multiplication.
 template <class T>
-Matrix<T> Matrix<T>::operator*(Matrix<T>& rhs) {
+Matrix<T> Matrix<T>::operator*(const Matrix<T>& rhs) {
     Matrix<T> mat = Matrix<T>::zeros(this->row, rhs.col);
     for (unsigned int i = 0; i < this->row; i++) {
         for (unsigned int j = 0; j < rhs.col; j++) {
@@ -404,7 +404,7 @@ Matrix<T> Matrix<T>::direct_sum(Matrix<T>& rhs) {
 /// \param rhs Right-hand operand.
 /// \return the sum of two matrices. **(Left-hand operand if number of the rows or columns are not strictly equivalent!!)**
 template <class T>
-Matrix<T> Matrix<T>::operator+(Matrix<T>& rhs) {
+Matrix<T> Matrix<T>::operator+(const Matrix<T>& rhs) {
     if (rhs.row != this->row || rhs.col != this->col) {
         return *this;
     } else {
@@ -473,12 +473,12 @@ Matrix<T> Matrix<T>::operator+(T rhs) {
 /// \param col_at
 /// \return
 template <class T>
-T Matrix<T>::at_unsafe(unsigned int row_at, unsigned int col_at) {
+T Matrix<T>::at_unsafe(unsigned int row_at, unsigned int col_at) const {
     return this->data[row_at * this->col + col_at];
 }
 
 template <class T>
-T Matrix<T>::at(unsigned int row_at, unsigned int col_at, bool& error) {
+T Matrix<T>::at(unsigned int row_at, unsigned int col_at, bool& error) const {
     if (row_at >= this->row || col_at >= this->col) {
         error = true;
         return NULL;
@@ -527,9 +527,7 @@ Matrix<T> Matrix<T>::zeros(unsigned int row_init, unsigned int col_init) {
 }
 
 template <class T>
-Matrix<T>::~Matrix() {
-
-}
+Matrix<T>::~Matrix() = default;
 
 #endif //RENDERER_MATRIX_H
 
@@ -538,11 +536,12 @@ Matrix<T>::~Matrix() {
 
 #define mi  Matrix<int>
 #define mf  Matrix<float>
-#define md  Vector3<double>
-#define mld Vector3<long double>
+#define md  Matrix<double>
+#define mld Matrix<long double>
 
 #define mat4f(_x, _y, _z, _w)  Matrix<float>::mat4(_x, _y, _z, _w)
 #define mat4d(_x, _y, _z, _w)  Matrix<double>::mat4(_x, _y, _z, _w)
 #define mat4ld(_x, _y, _z, _w) Matrix<long double>::mat4(_x, _y, _z, _w)
+#define mat4t(_x, _y, _z, _w)  Matrix<T>::mat4(_x, _y, _z, _w)
 
 #endif //RENDERER_MATRIX_MACRO

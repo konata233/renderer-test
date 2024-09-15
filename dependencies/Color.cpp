@@ -19,6 +19,10 @@ Color::Color(char red, char green, char blue) : Color(red, green, blue, 1.0) {
 
 }
 
+Color Color::copy() const {
+    return {this->r, this->g, this->b, this->a};
+}
+
 Color::~Color() = default;
 
 ColorHSV::ColorHSV() : h(0), s(100), v(100), a(1.0) {

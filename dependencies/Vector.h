@@ -66,11 +66,11 @@ public:
 
     Vector3<T> operator^(const Vector3<T>& rhs);
 
-    Vector3<T> copy();
+    Vector3<T> copy() const;
 
     T dot_prod(const Vector3<T>& rhs);
 
-    Vector3<T> cross_prod(const Vector3<T>& rhs);
+    Vector3<T> cross_prod(const Vector3<T>& rhs) const;
 
     T mod();
 
@@ -116,7 +116,7 @@ public:
 
     Vector4<T> operator*(T rhs);
 
-    Vector4<T> copy();
+    Vector4<T> copy() const;
 
     T dot_prod(const Vector4<T>& rhs);
 
@@ -167,7 +167,7 @@ Vector3<T> Vector3<T>::operator+(const Vector3<T>& rhs) {
 }
 
 template <class T>
-Vector3<T> Vector3<T>::copy() {
+Vector3<T> Vector3<T>::copy() const {
     auto v3 = Vector3<T>();
     v3.x = static_cast<T>(this->x);
     v3.y = static_cast<T>(this->y);
@@ -231,7 +231,7 @@ T Vector3<T>::mod() {
 }
 
 template <class T>
-Vector3<T> Vector3<T>::cross_prod(const Vector3<T>& rhs) {
+Vector3<T> Vector3<T>::cross_prod(const Vector3<T>& rhs) const {
     auto vec3 = Vector3<T>();
     vec3.x = this->y * rhs.z - this->z * rhs.y;
     vec3.y = this->z * rhs.x - this->x * rhs.z;
@@ -353,7 +353,7 @@ Vector4<T> Vector4<T>::operator+(const Vector4<T>& rhs) {
 }
 
 template <class T>
-Vector4<T> Vector4<T>::copy() {
+Vector4<T> Vector4<T>::copy() const {
     auto v4 = Vector4();
     v4.x = this->x;
     v4.y = this->y;
@@ -475,5 +475,15 @@ std::string Vector4<T>::stringify() {
 #define v3f  Vector3<float>
 #define v3d  Vector3<double>
 #define v3ld Vector3<long double>
+
+#define vec3f(_x, _y, _z)  Vector3<float>(_x, _y, _z)
+#define vec3d(_x, _y, _z)  Vector3<double>(_x, _y, _z)
+#define vec3ld(_x, _y, _z) Vector3<long double>(_x, _y, _z)
+#define vec3t(_x, _y, _z)  Vector3<T>(_x, _y, _z)
+
+#define vec4f(_x, _y, _z, _w)  Vector4<float>(_x, _y, _z, _w)
+#define vec4d(_x, _y, _z, _w)  Vector4<double>(_x, _y, _z, _w)
+#define vec4ld(_x, _y, _z, _w) Vector4<long double>(_x, _y, _z, _w)
+#define vec4t(_x, _y, _z, _w)  Vector4<T>(_x, _y, _z, _w)
 
 #endif //RENDERER_VECTOR_MACRO

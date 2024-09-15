@@ -12,6 +12,10 @@ _mat.set_unsafe(1, _col, _vec.y);  \
 _mat.set_unsafe(2, _col, _vec.z);  \
 _mat.set_unsafe(3, _col, 0);
 
+#define trans_f  Transform<float>
+#define trans_d  Transform<double>
+#define trans_ld Transform<long double>
+
 #endif
 
 #ifndef RENDERER_TRANSFORM_H
@@ -23,60 +27,85 @@ _mat.set_unsafe(3, _col, 0);
 template <class T>
 class Transform {
 public:
-    Matrix<T> scale(T sx, T sy, T sz);
+    static Matrix<T> scale(T sx, T sy, T sz);
 
-    Matrix<T> translate(T tx, T ty, T tz);
+    static Matrix<T> translate(T tx, T ty, T tz);
 
-    Matrix<T> translate(const Vector3<T>& t_vec);
+    static Matrix<T> translate(const Vector3<T>& t_vec);
 
-    Matrix<T> rotate(T rad_x, T rad_y, T rad_z);
+    static Matrix<T> rotate(T rad_x, T rad_y, T rad_z);
 
-    Matrix<T> view(const Vector3<T>& pos, const Vector3<T>& look_at, const Vector3<T>& up);
+    static Matrix<T> view(const Vector3<T>& pos, const Vector3<T>& look_at, const Vector3<T>& up, bool& error);
 
-    Matrix<T> orthographic(T l, T r, T b, T t, T f, T n);
+    static Matrix<T> orthographic(T left, T right, T bottom, T top, T far, T near);
 
-    Matrix<T> frustum(T l, T r, T d, T u, T f, T n);
+    static Matrix<T> frustum(T left, T right, T bottom, T top, T far, T near);
+
+    static Matrix<T> frustum(T fov_y, T wh_aspect, T far, T near);
+
+    static Matrix<T> viewport(T viewport_width, T viewport_height);
 
     Transform();
 
     ~Transform() = default;
 };
 
+template <class T>
+Matrix<T> Transform<T>::viewport(T viewport_width, T viewport_height) {
+    Matrix<T> mat = Matrix<T>::identity(4);
+    mat.set_unsafe(0, 0, viewport_width * -0.5); // necessary reverse to convert x=±0.5 to scr_x=0, 100 respectively.
+    mat.set_unsafe(1, 1, viewport_height * 0.5);
+    auto v3 = vec3t(viewport_width * 0.5, viewport_height * 0.5, 0);
+    SET_COL3(mat, 3, v3);
+    return mat;
+}
+
+template <class T>
+Matrix<T> Transform<T>::frustum(T fov_y, T wh_aspect, T far, T near) {
+    T t = std::tan(fov_y / 2) * std::abs(near);
+    T b = -t;
+    T r = wh_aspect * t;
+    T l = -r;
+    return frustum(l, r, b, t, far, near);
+}
+
 // not tested
 template <class T>
-Matrix<T> Transform<T>::frustum(T l, T r, T d, T u, T f, T n) {
+Matrix<T> Transform<T>::frustum(T left, T right, T bottom, T top, T far, T near) {
+    T w = std::abs(right - left);
+    T h = std::abs(top - bottom);
     T data[4][4] {
-        {2 * n / (r - l), 0, (r + l) / (r - l), 0},
-        {0, 2 * n / (u - d), (u + d) / (u - d), 0},
-        {0, 0, (-(f + n)) / (f - n), (-2 * f * n) / (f - n)},
-        {0, 0, -1, 0}
+            {2 * near / w, 0,            0,                           0},
+            {0,            2 * near / h, 0,                           0},
+            {0,            0,            (near + far) / (near - far), (-2 * far * near) / (near - far)},
+            {0,            0,            0,                           1}
     };
     return Matrix<T>(4, 4, data[0]);
 }
 
 // not tested
 template <class T>
-Matrix<T> Transform<T>::orthographic(T l, T r, T b, T t, T f, T n) {
-    Matrix<T> translate = this->translate(-(r + l) * 0.5, -(b + t) * 0.5, -(f + n) * 0.5);
-    Matrix<T> scale = this->scale(2.0 / (r - l), 2.0 / (t - b), 2.0 / (n - f));
+Matrix<T> Transform<T>::orthographic(T left, T right, T bottom, T top, T far, T near) {
+    Matrix<T> t = translate(-(right + left) * 0.5, -(bottom + top) * 0.5, -(far + near) * 0.5);
+    Matrix<T> s = scale(2.0 / (right - left), 2.0 / (top - bottom), 2.0 / (near - far));
 
-    return scale * translate;
+    return s * t;
 }
 
 template <class T>
 Matrix<T> Transform<T>::translate(const Vector3<T>& t_vec) {
-    return this->translate(t_vec.x, t_vec.y, t_vec.z);
+    return translate(t_vec.x, t_vec.y, t_vec.z);
 }
 
 template <class T>
-Matrix<T> Transform<T>::view(const Vector3<T>& pos, const Vector3<T>& look_at, const Vector3<T>& up) {
-    Matrix<T> t_view = translate(-pos);
-    Vector3<T> gt = cross_prod(look_at, up);
+Matrix<T> Transform<T>::view(const Vector3<T>& pos, const Vector3<T>& look_at, const Vector3<T>& up, bool& error) {
+    Matrix<T> t_view = translate(-pos.copy());
+    Vector3<T> gt = look_at.cross_prod(up);
     Matrix<T> r_view_inv = Matrix<T>::identity(4);
     SET_COL3(r_view_inv, 0, gt)
     SET_COL3(r_view_inv, 1, up)
     SET_COL3(r_view_inv, 2, -look_at)
-    Matrix<T> r_view = r_view_inv.invert();
+    Matrix<T> r_view = r_view_inv.invert(error);
 
     return r_view * t_view;
 }
@@ -119,11 +148,11 @@ Matrix<T> Transform<T>::translate(T tx, T ty, T tz) {
 
 template <class T>
 Matrix<T> Transform<T>::scale(T sx, T sy, T sz) {
-    T data[4][4] {
-        {sx, 0,  0,  0},
-        {0,  sy, 0,  0},
-        {0,  0,  sz, 0},
-        {0,  0,  0,  1}
+    T data[4][4]{
+            {sx, 0,  0,  0},
+            {0,  sy, 0,  0},
+            {0,  0,  sz, 0},
+            {0,  0,  0,  1}
     };
     return Matrix<T>(4, 4, data[0]);
 }

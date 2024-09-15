@@ -14,6 +14,8 @@ public:
     char b;
     float a;
 
+    Color copy() const; // NOLINT(*-use-nodiscard)
+
     Color(char red, char green, char blue, float alpha);
 
     Color(char red, char green, char blue);

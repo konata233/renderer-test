@@ -13,4 +13,12 @@ add_executable(renderer main.cpp
         dependencies/Color.cpp
         dependencies/Color.h
         dependencies/Transform.cpp
-        dependencies/Transform.h)
+        dependencies/Transform.h
+        dependencies/Camera.cpp
+        dependencies/Camera.h
+        dependencies/Screen.cpp
+        dependencies/Screen.h
+        dependencies/Triangle.cpp
+        dependencies/Triangle.h
+        dependencies/Vertex.cpp
+        dependencies/Vertex.h)
