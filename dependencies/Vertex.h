@@ -8,6 +8,7 @@
 
 #include "Vector.h"
 #include "Matrix.h"
+#include "Color.h"
 
 template <class T>
 class Vertex;

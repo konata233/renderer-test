@@ -58,3 +58,7 @@ Screen::Screen(unsigned int scr_width, unsigned int scr_height) {
         data[i] = Color();
     }
 }
+
+Screen::~Screen() {
+    delete[] this->data;
+}

@@ -31,4 +31,6 @@ add_executable(renderer main.cpp
         dependencies/Mesh.cpp
         dependencies/Mesh.h
         dependencies/Device.cpp
-        dependencies/Device.h)
+        dependencies/Device.h
+        dependencies/third-party/stb_image_write.h
+)

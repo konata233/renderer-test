@@ -7,16 +7,17 @@
 
 
 #include "Color.h"
+#include "Buffer.h"
 
-class Screen {
+class Screen : public IColorBufferLike {
 public:
-    unsigned int width;
-    unsigned int height;
-    unsigned long size;
+    unsigned int width{};
+    unsigned int height{};
+    unsigned long size{};
 
-    const Color* at(unsigned int idx_x, unsigned int idx_y, bool& error);
+    const Color* at(unsigned int idx_x, unsigned int idx_y, bool& error) override;
 
-    const Color* at_unsafe(unsigned int idx_x, unsigned int idx_y);
+    const Color* at_unsafe(unsigned int idx_x, unsigned int idx_y) override;
 
     void set(unsigned int idx_x, unsigned int idx_y, const Color& color, bool& error);
 
@@ -32,10 +33,12 @@ public:
 
     Screen() = default;
 
+    ~Screen();
+
     explicit Screen(unsigned int scr_width, unsigned int scr_height);
 
 protected:
-    Color* data;
+    Color* data{};
 };
 
 

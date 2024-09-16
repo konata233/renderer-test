@@ -61,3 +61,7 @@ void FrameBuffer::set(unsigned int w, unsigned int h, const Color& data, bool& e
 void FrameBuffer::set_unsafe(unsigned int w, unsigned int h, const Color& data) {
     this->buffer[h * this->width + w] = data.copy();
 }
+
+FrameBuffer::~FrameBuffer() {
+    delete[] this->buffer;
+}

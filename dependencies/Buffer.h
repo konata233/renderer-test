@@ -9,6 +9,19 @@
 #include <cmath>
 #include "Color.h"
 
+class IColorBufferLike {
+public:
+    unsigned int width{};
+
+    unsigned int height{};
+
+    unsigned int size{};
+
+    virtual const Color* at(unsigned int idx_x, unsigned int idx_y, bool& error) = 0;
+
+    virtual const Color* at_unsafe(unsigned int idx_x, unsigned int idx_y) = 0;
+};
+
 template <class T>
 class ZBuffer {
 public:
@@ -30,6 +43,8 @@ public:
 
     ZBuffer();
 
+    ~ZBuffer();
+
     ZBuffer(unsigned int width, unsigned int height);
 
     ZBuffer(unsigned int width, unsigned int height, T* data_init);
@@ -37,6 +52,11 @@ public:
 protected:
     T* buffer;
 };
+
+template <class T>
+ZBuffer<T>::~ZBuffer() {
+    delete[] this->buffer;
+}
 
 template <class T>
 bool ZBuffer<T>::set_check(unsigned int w, unsigned int h, T new_data) {
@@ -119,21 +139,23 @@ ZBuffer<T>::ZBuffer() {
     this->buffer = nullptr;
 }
 
-class FrameBuffer {
+class FrameBuffer : public IColorBufferLike {
 public:
     unsigned int width;
     unsigned int height;
     unsigned long size;
 
-    const Color* at(unsigned int w, unsigned int h, bool& error);
+    const Color* at(unsigned int w, unsigned int h, bool& error) override;
 
-    const Color* at_unsafe(unsigned int w, unsigned int h);
+    const Color* at_unsafe(unsigned int w, unsigned int h) override;
 
     void set(unsigned int w, unsigned int h, const Color& data, bool& error);
 
     void set_unsafe(unsigned int w, unsigned int h, const Color& data);
 
     FrameBuffer();
+
+    ~FrameBuffer();
 
     FrameBuffer(unsigned int w, unsigned int h, const Color& bg);
 

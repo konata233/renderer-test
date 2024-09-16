@@ -7,17 +7,15 @@
 
 
 #include <string>
-#include "Color.h"
 
-class Stringify {
+class IStringify {
 public:
     virtual std::string stringify() = 0;
 };
 
-class PrettyPrint {
+class IPrettyPrint {
 public:
     virtual std::string pretty_print() = 0;
 };
-
 
 #endif //RENDERER_COMMON_H

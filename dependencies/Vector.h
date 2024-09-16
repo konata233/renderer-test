@@ -8,7 +8,7 @@
 #include "Common.h"
 
 template <class T>
-class Vector : public Stringify {
+class Vector : public IStringify {
 /*
     friend T dot_prod(const Vector<T>& lhs, const Vector<T>& rhs);
     friend Vector<T> cross_prod(const Vector<T>& lhs, const Vector<T>& rhs);
@@ -38,7 +38,7 @@ public:
 };
 
 template <class T>
-class Vector3 : public Stringify {
+class Vector3 : public IStringify {
     friend T dot_prod(const Vector3<T>& lhs, const Vector3<T>& rhs);
 
     friend Vector3<T> cross_prod(const Vector3<T>& lhs, const Vector3<T>& rhs);
@@ -91,7 +91,7 @@ Vector3<T> Vector3<T>::operator^(const Vector3<T>& rhs) {
 }
 
 template <class T>
-class Vector4 : public Stringify {
+class Vector4 : public IStringify {
     friend T dot_prod(const Vector4<T>& lhs, const Vector4<T>& rhs);
 
     friend Vector4<T> cross_prod(const Vector4<T>& lhs, const Vector4<T>& rhs);

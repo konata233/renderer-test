@@ -13,7 +13,7 @@
 #include "Vector.h"
 
 template <class T>
-class Matrix : public Stringify, public PrettyPrint {
+class Matrix : public IStringify, public IPrettyPrint {
 public:
     unsigned int row;
     unsigned int col;
