@@ -21,4 +21,12 @@ add_executable(renderer main.cpp
         dependencies/Triangle.cpp
         dependencies/Triangle.h
         dependencies/Vertex.cpp
-        dependencies/Vertex.h)
+        dependencies/Vertex.h
+        dependencies/Renderer.cpp
+        dependencies/Renderer.h
+        dependencies/Buffer.cpp
+        dependencies/Buffer.h
+        dependencies/Shader.cpp
+        dependencies/Shader.h
+        dependencies/Mesh.cpp
+        dependencies/Mesh.h)

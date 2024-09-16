@@ -69,12 +69,12 @@ Matrix<T> Transform<T>::frustum(T fov_y, T wh_aspect, T far, T near) {
     return frustum(l, r, b, t, far, near);
 }
 
-// not tested
+// tested (limited cases)
 template <class T>
 Matrix<T> Transform<T>::frustum(T left, T right, T bottom, T top, T far, T near) {
     T w = std::abs(right - left);
     T h = std::abs(top - bottom);
-    T data[4][4] {
+    T data[4][4]{
             {2 * near / w, 0,            0,                           0},
             {0,            2 * near / h, 0,                           0},
             {0,            0,            (near + far) / (near - far), (-2 * far * near) / (near - far)},
@@ -83,7 +83,7 @@ Matrix<T> Transform<T>::frustum(T left, T right, T bottom, T top, T far, T near)
     return Matrix<T>(4, 4, data[0]);
 }
 
-// not tested
+// tested (limited cases)
 template <class T>
 Matrix<T> Transform<T>::orthographic(T left, T right, T bottom, T top, T far, T near) {
     Matrix<T> t = translate(-(right + left) * 0.5, -(bottom + top) * 0.5, -(far + near) * 0.5);

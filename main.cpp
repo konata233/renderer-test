@@ -66,9 +66,9 @@ int main() {
     std::cout << mat6.pretty_print() << std::endl;
     std::cout << "-----------------------" << std::endl;
 
-    auto vt = vec4f(0.5, 0.8, 1, 1);
+    auto vt = vec4f(0.5, 0.5, 2, 1);
     auto view = trans_f::view(vec3f(0, 0, 0), vec3f(0, 0, 1), vec3f(0, 1, 0), err);
-    auto fru = Transform<float>::frustum(RAD(75), 1, 1, 0.1);
+    auto fru = Transform<float>::frustum(RAD(75), 1, 10, 0.01);
     auto ortho = trans_f::orthographic(-1, 1, -1, 1, 1, -1);
     auto viewport = Transform<float>::viewport(100, 100);
     std::cout << "----------00000-------------" << std::endl;
@@ -80,10 +80,10 @@ int main() {
     auto transform = trans_f::view(vec3f(0, 0, 0), vec3f(0, 0, 1), vec3f(0, 1, 0), err);
     std::cout << transform.pretty_print() << std::endl;
 
-    transform = Transform<float>::frustum(RAD(75), 1, 1, 0.1) * transform;
-    std::cout << Transform<float>::frustum(RAD(70), 1, 1000, 0.1).pretty_print() <<std::endl;
+    //transform = Transform<float>::frustum(RAD(60), 1, 100, 0.01) * transform;
+    //std::cout << Transform<float>::frustum(RAD(70), 1, 1000, 0.1).pretty_print() <<std::endl;
 
-    //transform = trans_f::orthographic(-1, 1, -1, 1, 1, -1) * transform;
+    transform = trans_f::orthographic(-1, 1, -1, 1, 1, -1) * transform;
     std::cout << "-----------------------" << std::endl;
 
     std::cout << "-----------------------" << std::endl;
