@@ -12,6 +12,7 @@ class Screen {
 public:
     unsigned int width;
     unsigned int height;
+    unsigned long size;
 
     const Color* at(unsigned int idx_x, unsigned int idx_y, bool& error);
 
@@ -28,6 +29,10 @@ public:
     void set_unsafe(unsigned int idx_x, unsigned int idx_y, char r, char g, char b, float a);
 
     void set_unsafe(unsigned int idx_x, unsigned int idx_y, char r, char g, char b);
+
+    Screen() = default;
+
+    explicit Screen(unsigned int scr_width, unsigned int scr_height);
 
 protected:
     Color* data;

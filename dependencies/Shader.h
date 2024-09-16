@@ -10,10 +10,23 @@
 
 template <class T>
 class FragmentShader {
-    Vertex<T>* vertices;
+    Color apply(Vertex<T>* vertices, const Color& color_interpolated);
 
-    FragmentShader(Vertex<T>* vs); // todo
+    explicit FragmentShader(Color (* prog)(Vertex<T>* vertices, const Color& color_interpolated));
+
+protected:
+    Color (* prog)(Vertex<T>* vertices, const Color* color_interpolated);
 };
+
+template <class T>
+Color FragmentShader<T>::apply(Vertex<T>* vertices, const Color& color_interpolated) {
+    return this->prog(vertices, color_interpolated);
+}
+
+template <class T>
+FragmentShader<T>::FragmentShader(Color (* prog)(Vertex<T>*, const Color&)) {
+    this->prog = prog;
+}
 
 
 #endif //RENDERER_SHADER_H

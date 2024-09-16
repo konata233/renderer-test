@@ -47,3 +47,14 @@ void Screen::set_unsafe(unsigned int idx_x, unsigned int idx_y, char r, char g, 
 void Screen::set_unsafe(unsigned int idx_x, unsigned int idx_y, char r, char g, char b) {
     set_unsafe(idx_x, idx_y, r, g, b, 1.0);
 }
+
+Screen::Screen(unsigned int scr_width, unsigned int scr_height) {
+    this->width = scr_width;
+    this->height = scr_height;
+    this->size = scr_width * scr_height;
+
+    this->data = new Color[this->size];
+    for (unsigned long i = 0; i < this->size ; i++) {
+        data[i] = Color();
+    }
+}

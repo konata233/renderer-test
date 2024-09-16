@@ -29,4 +29,6 @@ add_executable(renderer main.cpp
         dependencies/Shader.cpp
         dependencies/Shader.h
         dependencies/Mesh.cpp
-        dependencies/Mesh.h)
+        dependencies/Mesh.h
+        dependencies/Device.cpp
+        dependencies/Device.h)

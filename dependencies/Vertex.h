@@ -23,11 +23,15 @@ public:
 
     Vertex<T>* apply_viewport_transform(Matrix<T> viewport);
 
-    Vertex<T>* apply_shader(VertexShader<T> s);
+    Vertex<T>* set_shader(VertexShader<T> s);
+
+    const Color* get_color();
 
     Vertex();
 
-    Vertex(const Vector4<T>& pos);
+    explicit Vertex(const Vector4<T>& pos);
+
+    Vertex(const Vector4<T>& pos, VertexShader<T> s);
 
 protected:
     Vector4<T> pos;
@@ -41,13 +45,26 @@ protected:
 };
 
 template <class T>
+Vertex<T>::Vertex(const Vector4<T>& pos, VertexShader<T> s) {
+    this->pos = pos;
+    this->primary = vec4t(0, 0, 0, 1);
+    this->final = vec4t(0, 0, 0, 1);
+    this->shader = s;
+}
+
+template <class T>
+const Color* Vertex<T>::get_color() {
+    return this->shader.apply();
+}
+
+template <class T>
 Vertex<T>* Vertex<T>::apply_primary_transform(Matrix<T> transform) {
     this->primary = transform * this->pos;
     return this;
 }
 
 template <class T>
-Vertex<T>* Vertex<T>::apply_shader(VertexShader<T> s) {
+Vertex<T>* Vertex<T>::set_shader(VertexShader<T> s) {
     this->shader = s;
     return this;
 }
@@ -78,10 +95,6 @@ Vertex<T>::Vertex() {
 template <class T>
 class VertexShader {
 public:
-    Vertex<T>* vertex;
-
-    Color (* prog)(Vertex<T>* vert);
-
     const Color* apply();
 
     void reset();
@@ -89,6 +102,10 @@ public:
     VertexShader(Vertex<T>* vert, Color (* prog)(Vertex<T>* v));
 
 protected:
+    Vertex<T>* vertex;
+
+    Color (* prog)(Vertex<T>* vert);
+
     Color buffer;
     bool buffer_available;
 };
@@ -105,6 +122,7 @@ const Color* VertexShader<T>::apply() {
     } else {
         this->buffer = this->prog(this->vertex);
         this->buffer_available = true;
+        return &this->buffer;
     }
 }
 

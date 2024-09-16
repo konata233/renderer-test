@@ -9,16 +9,20 @@
 
 class Color {
 public:
-    char r;
-    char g;
-    char b;
+    float r;
+    float g;
+    float b;
     float a;
 
     Color copy() const; // NOLINT(*-use-nodiscard)
 
-    Color(char red, char green, char blue, float alpha);
+    Color(float red, float green, float blue, float alpha);
 
-    Color(char red, char green, char blue);
+    Color(float red, float green, float blue);
+
+    Color operator*(float rhs) const;
+
+    Color operator+(const Color& rhs) const;
 
     ~Color();
 
@@ -33,17 +37,17 @@ public:
 class ColorHSV : public ToRGB {
 public:
     unsigned short h;
-    char s;
-    char v;
+    float s;
+    float v;
     float a;
 
     Color to_rgb() override;
 
     ColorHSV();
 
-    ColorHSV(unsigned short hue, char saturation, char value, float alpha);
+    ColorHSV(unsigned short hue, float saturation, float value, float alpha);
 
-    ColorHSV(unsigned short hue, char saturation, char value);
+    ColorHSV(unsigned short hue, float saturation, float value);
 
     ~ColorHSV();
 };
@@ -51,17 +55,17 @@ public:
 class ColorHSL : public ToRGB {
 public:
     unsigned short h;
-    char s;
-    char l;
+    float s;
+    float l;
     float a;
 
     Color to_rgb() override;
 
     ColorHSL();
 
-    ColorHSL(unsigned short hue, char saturation, char lightness, float alpha);
+    ColorHSL(unsigned short hue, float saturation, float lightness, float alpha);
 
-    ColorHSL(unsigned short hue, char saturation, char lightness);
+    ColorHSL(unsigned short hue, float saturation, float lightness);
 
     ~ColorHSL();
 };
