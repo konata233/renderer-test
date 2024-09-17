@@ -163,6 +163,20 @@ auto Triangle<T>::calculate_barycentric_2d(T x, T y) {
               ((vec0_2d.y - vec1_2d.y) * vec2_2d.x + (vec1_2d.x - vec0_2d.x) * vec2_2d.y + vec0_2d.x * vec1_2d.y -
                vec1_2d.x * vec0_2d.y);
 
+    /*Vector3<T> ab = vec1_2d - vec0_2d;
+    Vector3<T> ac = vec2_2d - vec0_2d;
+    auto s = 0.5 * ab.cross_prod(ac).mod();
+
+    Vector3<T> p = vec3t(x, y, 0);
+    Vector3<T> pa = vec0_2d - p;
+    Vector3<T> pb = vec1_2d - p;
+    Vector3<T> pc = vec2_2d - p;
+
+    auto sa = 0.5 * pb.cross_prod(pc).mod();
+    auto sb = 0.5 * pa.cross_prod(pc).mod();
+    auto sc = 0.5 * pa.cross_prod(pb).mod();
+    T beta = sb / s;
+    T gamma = sc / s;*/
     T alpha = 1 - beta - gamma;
     return std::tuple(alpha, beta, gamma);
 }

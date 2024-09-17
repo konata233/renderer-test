@@ -12,6 +12,12 @@ _mat.set_unsafe(1, _col, _vec.y);  \
 _mat.set_unsafe(2, _col, _vec.z);  \
 _mat.set_unsafe(3, _col, 0);
 
+#define SET_ROW3(_mat, _row, _vec) \
+_mat.set_unsafe(_row, 0, _vec.x);  \
+_mat.set_unsafe(_row, 1, _vec.y);  \
+_mat.set_unsafe(_row, 2, _vec.z);  \
+_mat.set_unsafe(_row, 3, 0);
+
 #define trans_f  Transform<float>
 #define trans_d  Transform<double>
 #define trans_ld Transform<long double>
@@ -104,10 +110,13 @@ Matrix<T> Transform<T>::view(const Vector3<T>& pos, const Vector3<T>& look_at, c
     Matrix<T> t_view = translate(-pos.copy());
     Vector3<T> gt = look_at.cross_prod(up);
     Matrix<T> r_view_inv = Matrix<T>::identity(4);
-    SET_COL3(r_view_inv, 0, gt)
-    SET_COL3(r_view_inv, 1, up)
-    SET_COL3(r_view_inv, 2, -look_at)
-    Matrix<T> r_view = r_view_inv.invert(error);
+    //SET_COL3(r_view_inv, 0, gt)
+    //SET_COL3(r_view_inv, 1, up)
+    //SET_COL3(r_view_inv, 2, -look_at)
+    SET_ROW3(r_view_inv, 0, gt)
+    SET_ROW3(r_view_inv, 1, up)
+    SET_ROW3(r_view_inv, 2, -look_at)
+    Matrix<T> r_view = r_view_inv;//.invert(error);
 
     return r_view * t_view;
 }

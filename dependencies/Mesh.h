@@ -76,8 +76,8 @@ void Mesh<T>::render_mesh(FrameBuffer* frame_buffer, ZBuffer<T>* z_buffer) {
                         auto [alpha, beta, gamma] = tri.calculate_barycentric_2d(i, j);
                         auto z = tri.interpolate_depth(i, j);
                         auto [za, zb, zc] = tri.depths();
-                        Color c_interpolated = (tri.get_vert_color(0)->copy() * alpha * (1 / za) + tri.get_vert_color(1)->copy() * beta * (1 / zb) +
-                                               tri.get_vert_color(2)->copy() * gamma * (1 / zc)) * z;
+                        Color c_interpolated = (tri.get_vert_color(0)->copy()  * (z * alpha / za) + tri.get_vert_color(1)->copy() * (z * beta / zb) +
+                                               tri.get_vert_color(2)->copy() * (z * gamma / zc));
                         frame_buffer->set_unsafe(i, j, this->shader.apply(tri.vertices, c_interpolated));
                     }
                 }
