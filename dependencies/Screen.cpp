@@ -59,6 +59,4 @@ Screen::Screen(unsigned int scr_width, unsigned int scr_height) {
     }
 }
 
-Screen::~Screen() {
-    delete[] this->data;
-}
+Screen::~Screen() = default;

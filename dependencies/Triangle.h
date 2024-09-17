@@ -11,12 +11,24 @@
 
 template <class T>
 T min4(T a, T b, T c, T d) {
-    return std::min(std::min(a, b), std::min(c, d));
+    T arr[] {a, b, c, d};
+    T min = INFINITY;
+    for (int i = 0; i < 4; i++) {
+        min = std::min(arr[i], min);
+    }
+    if (min < 0) min = 0;
+    return min;
 }
 
 template <class T>
-T max4(T a, T b, T c, T d) {
-    return std::max(std::max(a, b), std::max(c, d));
+T max4(T a, T b, T c, T d, T m) {
+    T arr[] {a, b, c, d};
+    T max = 0;
+    for (int i = 0; i < 4; i++) {
+        max = std::max(arr[i], max);
+    }
+    if (max > m) max = m;
+    return max;
 }
 
 template <class T>
@@ -30,7 +42,23 @@ struct Envelope {
 template <class T>
 class Triangle {
 public:
+    Vector3<T> vec0_2d;
+    Vector3<T> vec1_2d;
+    Vector3<T> vec2_2d;
+
+    Vector3<T> vec0_3d;
+    Vector3<T> vec1_3d;
+    Vector3<T> vec2_3d;
+
     Vertex<T>* vertices;
+
+    Triangle<T>* ready();
+
+    Triangle<T>* apply_model_transform(Matrix<T>& transform);
+
+    Triangle<T>* apply_view_persp_transform(Matrix<T>& transform);
+
+    Triangle<T>* apply_viewport_transform(Matrix<T>& viewport);
 
     bool contains(T x, T y);
 
@@ -42,26 +70,74 @@ public:
 
     auto calculate_barycentric_2d(T x, T y);
 
+    auto depths();
+
     static auto
     calculate_barycentric_2d(T x, T y, const Vector3<T>& vec0, const Vector3<T>& vec1, const Vector3<T>& vec2);
 
     explicit Triangle(Vertex<T>* vertices);
-
-protected:
-
-    Vector3<T> vec0_2d;
-    Vector3<T> vec1_2d;
-    Vector3<T> vec2_2d;
-
-    Vector3<T> vec0_3d;
-    Vector3<T> vec1_3d;
-    Vector3<T> vec2_3d;
 };
+
+template <class T>
+Triangle<T>* Triangle<T>::apply_model_transform(Matrix<T>& transform) {
+    for (int i = 0; i < 3; i++) {
+        this->vertices[i].apply_model_transform(transform);
+    }
+    return this;
+}
+
+template <class T>
+auto Triangle<T>::depths() {
+    T za = vec0_3d.z;
+    T zb = vec1_3d.z;
+    T zc = vec2_3d.z;
+
+    return std::tuple(za, zb, zc);
+}
+
+template <class T>
+Triangle<T>* Triangle<T>::ready() {
+    auto t0 = &this->vertices[0].final;
+    this->vec0_2d = vec3t(t0->at_unsafe(0, 0), t0->at_unsafe(0, 1), 0);
+
+    auto t1 = &this->vertices[1].final;
+    this->vec1_2d = vec3t(t1->at_unsafe(0, 0), t1->at_unsafe(0, 1), 0);
+
+    auto t2 = &this->vertices[2].final;
+    this->vec2_2d = vec3t(t2->at_unsafe(0, 0), t2->at_unsafe(0, 1), 0);
+
+    t0 = &this->vertices[0].primary;
+    this->vec0_3d = vec3t(t0->at_unsafe(0, 0), t0->at_unsafe(0, 1), t0->at_unsafe(0, 2));
+
+    t1 = &this->vertices[1].primary;
+    this->vec1_3d = vec3t(t1->at_unsafe(0, 0), t1->at_unsafe(0, 1), t1->at_unsafe(0, 2));
+
+    t2 = &this->vertices[2].primary;
+    this->vec2_3d = vec3t(t2->at_unsafe(0, 0), t2->at_unsafe(0, 1), t2->at_unsafe(0, 2));
+
+    return this;
+}
+
+template <class T>
+Triangle<T>* Triangle<T>::apply_viewport_transform(Matrix<T>& viewport) {
+    for (int i = 0; i < 3; i++) {
+        this->vertices[i].apply_viewport_transform(viewport);
+    }
+    return this;
+}
+
+template <class T>
+Triangle<T>* Triangle<T>::apply_view_persp_transform(Matrix<T>& transform) {
+    for (int i = 0; i < 3; i++) {
+        this->vertices[i].apply_primary_transform(transform);
+    }
+    return this;
+}
 
 template <class T>
 const Color* Triangle<T>::get_vert_color(unsigned int idx) {
     if (idx >= 3) idx = 2;
-    Vertex<T>* vert = &this->vertices[0];
+    Vertex<T>* vert = &this->vertices[idx];
     return vert->get_color();
 }
 
@@ -70,25 +146,24 @@ Envelope<T> Triangle<T>::calculate_envelope(T max_x, T max_y) {
     Envelope<T> envelope;
     envelope.min_x = min4(vec0_2d.x, vec1_2d.x, vec2_2d.x, static_cast<T>(max_x)); // !!
     envelope.min_y = min4(vec0_2d.y, vec1_2d.y, vec2_2d.y,  static_cast<T>(max_y));
-    envelope.max_x = min4(vec0_2d.x, vec1_2d.x, vec2_2d.x, static_cast<T>(0));
-    envelope.max_y = min4(vec0_2d.y, vec1_2d.y, vec2_2d.y, static_cast<T>(0));
+    envelope.max_x = max4(vec0_2d.x, vec1_2d.x, vec2_2d.x, static_cast<T>(0), max_x);
+    envelope.max_y = max4(vec0_2d.y, vec1_2d.y, vec2_2d.y, static_cast<T>(0), max_y);
     return envelope;
 }
 
 template <class T>
 auto Triangle<T>::calculate_barycentric_2d(T x, T y) {
-    T beta = ((vec0_2d.y - vec2_2d.y) * x + (vec2_2d.x - vec0_2d.x) * y + vec0_2d.x * vec2_2d.x -
+    T beta = ((vec0_2d.y - vec2_2d.y) * x + (vec2_2d.x - vec0_2d.x) * y + vec0_2d.x * vec2_2d.y -
               vec2_2d.x * vec0_2d.y) /
-             ((vec0_2d.y - vec2_2d.y) * vec1_2d.x + (vec2_2d.x - vec0_2d.x) * vec1_2d.y + vec0_2d.x * vec2_2d.x -
+             ((vec0_2d.y - vec2_2d.y) * vec1_2d.x + (vec2_2d.x - vec0_2d.x) * vec1_2d.y + vec0_2d.x * vec2_2d.y -
               vec2_2d.x * vec0_2d.y);
 
-    T gamma = ((vec0_2d.y - vec1_2d.y) * x + (vec1_2d.x - vec0_2d.x) * y + vec0_2d.x * vec1_2d.x -
+    T gamma = ((vec0_2d.y - vec1_2d.y) * x + (vec1_2d.x - vec0_2d.x) * y + vec0_2d.x * vec1_2d.y -
                vec1_2d.x * vec0_2d.y) /
-              ((vec0_2d.y - vec1_2d.y) * vec2_2d.x + (vec1_2d.x - vec0_2d.x) * vec2_2d.y + vec0_2d.x * vec1_2d.x -
+              ((vec0_2d.y - vec1_2d.y) * vec2_2d.x + (vec1_2d.x - vec0_2d.x) * vec2_2d.y + vec0_2d.x * vec1_2d.y -
                vec1_2d.x * vec0_2d.y);
 
     T alpha = 1 - beta - gamma;
-
     return std::tuple(alpha, beta, gamma);
 }
 
@@ -142,6 +217,7 @@ T Triangle<T>::interpolate_depth(T x, T y) {
     T zc = vec2_3d.z;
 
     T depth = 1 / (alpha / za + beta / zb + gamma / zc);
+    //std::cout << depth << std::endl;
     return depth;
 }
 
@@ -151,24 +227,6 @@ T Triangle<T>::interpolate_depth(T x, T y) {
 template <class T>
 Triangle<T>::Triangle(Vertex<T>* vertices) {
     this->vertices = vertices;
-
-    auto t0 = &this->vertices[0].final;
-    this->vec0_2d = vec3t(t0->x, t0->y, 0);
-
-    auto t1 = &this->vertices[1].final;
-    this->vec1_2d = vec3t(t1->x, t1->y, 0);
-
-    auto t2 = &this->vertices[2].final;
-    this->vec2_2d = vec3t(t2->x, t2->y, 0);
-
-    t0 = &this->vertices[0].primary;
-    this->vec0_3d = vec3t(t0->x, t0->y, t0->z);
-
-    t1 = &this->vertices[1].primary;
-    this->vec1_3d = vec3t(t1->x, t1->y, t1->z);
-
-    t2 = &this->vertices[2].primary;
-    this->vec2_3d = vec3t(t2->x, t2->y, t2->z);
 }
 
 

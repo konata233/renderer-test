@@ -54,9 +54,7 @@ protected:
 };
 
 template <class T>
-ZBuffer<T>::~ZBuffer() {
-    delete[] this->buffer;
-}
+ZBuffer<T>::~ZBuffer() = default;
 
 template <class T>
 bool ZBuffer<T>::set_check(unsigned int w, unsigned int h, T new_data) {

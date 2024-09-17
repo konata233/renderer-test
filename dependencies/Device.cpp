@@ -4,14 +4,15 @@
 
 #include "Device.h"
 #include "Buffer.h"
+#include <iostream>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "third-party/stb_image_write.h"
-
+#include "Screen.h"
 
 ImageOutputDevice::ImageOutputDevice() = default;
 
-void ImageOutputDevice::bind_source(IColorBufferLike* buf) {
+void ImageOutputDevice::bind_source(Screen* buf) {
     this->buffer = buf;
 }
 
@@ -30,6 +31,7 @@ void ImageOutputDevice::write_to_file(const char* filename) {
             data[width * j * channels + i * channels + 2] = static_cast<unsigned char>(c->b);
         }
     }
+    stbi_flip_vertically_on_write(true);
     stbi_write_png(filename, (int)width, (int)height, (int)channels, data, 0);
-    delete[] data;
+    //delete[] data;
 }

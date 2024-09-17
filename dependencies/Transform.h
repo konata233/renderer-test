@@ -43,7 +43,7 @@ public:
 
     static Matrix<T> frustum(T fov_y, T wh_aspect, T far, T near);
 
-    static Matrix<T> viewport(T viewport_width, T viewport_height);
+    static Matrix<T> viewport(T viewport_width, T viewport_height, T msaa_scale);
 
     Transform();
 
@@ -51,12 +51,14 @@ public:
 };
 
 template <class T>
-Matrix<T> Transform<T>::viewport(T viewport_width, T viewport_height) {
+Matrix<T> Transform<T>::viewport(T viewport_width, T viewport_height, T msaa_scale) {
     Matrix<T> mat = Matrix<T>::identity(4);
+    viewport_width *= msaa_scale;
+    viewport_height *= msaa_scale;
     mat.set_unsafe(0, 0, viewport_width * -0.5); // necessary reverse to convert x=±0.5 to scr_x=0, 100 respectively.
     mat.set_unsafe(1, 1, viewport_height * 0.5);
     auto v3 = vec3t(viewport_width * 0.5, viewport_height * 0.5, 0);
-    SET_COL3(mat, 3, v3);
+    SET_COL3(mat, 3, v3)
     return mat;
 }
 

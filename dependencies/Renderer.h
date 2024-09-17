@@ -12,13 +12,17 @@
 
 class Renderer {
 public:
-    void append_mesh(const Mesh<float>& mesh);
+    Renderer* append_mesh(const Mesh<float>& mesh);
 
     void render_all();
 
     Renderer(unsigned int scr_width, unsigned int scr_height);
 
     Renderer(unsigned int scr_width, unsigned int scr_height, int msaa_scale);
+
+    Screen* get_screen_buffer();
+
+    FrameBuffer* get_frame_buffer();
 
 protected:
     std::vector<Mesh<float>> meshes;

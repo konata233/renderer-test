@@ -8,17 +8,18 @@
 #include <string>
 #include "Common.h"
 #include "Buffer.h"
+#include "Screen.h"
 
 class ImageOutputDevice {
 public:
     void write_to_file(const char* filename);
 
-    void bind_source(IColorBufferLike* buf);
+    void bind_source(Screen* buf);
 
     ImageOutputDevice();
 
 protected:
-    IColorBufferLike* buffer{};
+    Screen* buffer{};
 
 };
 
