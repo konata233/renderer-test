@@ -74,8 +74,8 @@ Vertex<T>* Vertex<T>::apply_model_transform(Matrix<T>& transform) {
 template <class T>
 Vertex<T>::Vertex(const Vector4<T>& pos, VertexShader<T> s) {
     this->pos = pos;
-    this->primary = vec4t(0, 0, 0, 1);
-    this->final = vec4t(0, 0, 0, 1);
+    this->primary = mat4t(0, 0, 0, 1);
+    this->final = mat4t(0, 0, 0, 1);
     this->shader = s;
 }
 

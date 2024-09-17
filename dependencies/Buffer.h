@@ -68,7 +68,7 @@ bool ZBuffer<T>::set_check(unsigned int w, unsigned int h, T new_data) {
 template <class T>
 bool ZBuffer<T>::check(unsigned int w, unsigned int h, T new_data) {
     T current = this->at_unsafe(w, h);
-    return (new_data < current || current == INFINITY);
+    return (new_data < current || current == INFINITY) && new_data >= 0;
 }
 
 template <class T>

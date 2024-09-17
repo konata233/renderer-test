@@ -83,9 +83,9 @@ Matrix<T> Transform<T>::frustum(T left, T right, T bottom, T top, T far, T near)
     T w = std::abs(right - left);
     T h = std::abs(top - bottom);
     T data[4][4]{
-            {2 * near / w, 0,            0,                           0},
-            {0,            2 * near / h, 0,                           0},
-            {0,            0,            (near + far) / (near - far), (-2 * far * near) / (near - far)},
+            {2 * near / w, 0,            (left + right) / (left - right),                           0},
+            {0,            2 * near / h, (bottom + top) / (bottom - top),                           0},
+            {0,            0,            (near + far) / (near - far), (2 * far * near) / (far - near)},
             {0,            0,            0,                           1}
     };
     return Matrix<T>(4, 4, data[0]);
@@ -94,7 +94,8 @@ Matrix<T> Transform<T>::frustum(T left, T right, T bottom, T top, T far, T near)
 // tested (limited cases)
 template <class T>
 Matrix<T> Transform<T>::orthographic(T left, T right, T bottom, T top, T far, T near) {
-    Matrix<T> t = translate(-(right + left) * 0.5, -(bottom + top) * 0.5, -(far + near) * 0.5);
+    //Matrix<T> t = translate(-(right + left) * 0.5, -(bottom + top) * 0.5, -(far + near) * 0.5);
+    Matrix<T> t = translate(-(right + left) / (right - left), -(bottom + top) / (top - bottom), -(far + near) * (near - far));
     Matrix<T> s = scale(2.0 / (right - left), 2.0 / (top - bottom), 2.0 / (near - far));
 
     return s * t;
@@ -110,12 +111,16 @@ Matrix<T> Transform<T>::view(const Vector3<T>& pos, const Vector3<T>& look_at, c
     Matrix<T> t_view = translate(-pos.copy());
     Vector3<T> gt = look_at.cross_prod(up);
     Matrix<T> r_view_inv = Matrix<T>::identity(4);
+
+    Vector3<T> w = (-look_at.copy()) * (1 / look_at.copy().mod());
+    Vector3<T> u = up.cross_prod(w) * (1 / up.cross_prod(w).mod());
+    Vector3<T> v = w.cross_prod(u);
     //SET_COL3(r_view_inv, 0, gt)
     //SET_COL3(r_view_inv, 1, up)
     //SET_COL3(r_view_inv, 2, -look_at)
-    SET_ROW3(r_view_inv, 0, gt)
-    SET_ROW3(r_view_inv, 1, up)
-    SET_ROW3(r_view_inv, 2, -look_at)
+    SET_ROW3(r_view_inv, 0, u)
+    SET_ROW3(r_view_inv, 1, v)
+    SET_ROW3(r_view_inv, 2, w)
     Matrix<T> r_view = r_view_inv;//.invert(error);
 
     return r_view * t_view;
