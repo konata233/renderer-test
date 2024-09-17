@@ -33,15 +33,15 @@ int main() {
     Mesh<float> mesh = Mesh(fs);
 
     Vertex<float> vt3 = Vertex<float>(vec4f(-0.5, -0.5, 0, 1));
-    VertexShader<float> vs3 = VertexShader<float>(&vt3, [](VertexShaderContext<float>& ctx){return Color(255, 0, 0);});
+    VertexShader<float> vs3 = VertexShader<float>(&vt3, [](VertexShaderContext<float>& ctx){return Color(255, 255, 0);});
     vt3.set_shader(vs3);
 
     Vertex<float> vt4 = Vertex<float>(vec4f(0.5, -0.5, 0, 1));
-    VertexShader<float> vs4 = VertexShader<float>(&vt4, [](VertexShaderContext<float>& ctx){return Color(0, 255, 0);});
+    VertexShader<float> vs4 = VertexShader<float>(&vt4, [](VertexShaderContext<float>& ctx){return Color(0, 255, 255);});
     vt4.set_shader(vs4);
 
     Vertex<float> vt5 = Vertex<float>(vec4f(0.0, 0.5, 0, 1));
-    VertexShader<float> vs5 = VertexShader<float>(&vt5, [](VertexShaderContext<float>& ctx){return Color(0, 0, 255);});
+    VertexShader<float> vs5 = VertexShader<float>(&vt5, [](VertexShaderContext<float>& ctx){return Color(255, 0, 255);});
     vt5.set_shader(vs5);
 
     Vertex<float> vertices2[3] = {vt3, vt4, vt5};
@@ -51,16 +51,16 @@ int main() {
     Mesh<float> mesh2 = Mesh(fs2);
 
     auto v = trans_f::view(vec3f(0, 0, 0), vec3f(0, 0, 1), vec3f(0, 1, 0), err);
-    auto f = Transform<float>::frustum(RAD(90), 1, 10000, 0.001);
+    auto f = Transform<float>::frustum(RAD(60), 1, 100, 0.001);
     auto o = trans_f::orthographic(-1, 1, -1, 1, 1, -1);
     auto vp = Transform<float>::viewport(100, 100, 4);
 
     auto pt = f * v;
-    auto model = trans_f::translate(0, 0, 1.5) * trans_f::scale(1.125, 1.125, 1.125) * trans_f::rotate(RAD(-50), RAD(20), RAD(-30));
+    auto model = trans_f::translate(0, 0, 1) * trans_f::rotate(RAD(0), RAD(0), RAD(0));
     mesh.append_triangle(triangle)->apply_model_transform(model)->apply_view_persp_transform(pt)->apply_viewport_transform(vp)->ready();
 
     auto pt2 = f * v;
-    auto model2 = trans_f::translate(0, 0.1, 1) * trans_f::rotate(RAD(30), RAD(0), RAD(40));
+    auto model2 = trans_f::translate(0, 0, 1) * trans_f::rotate(RAD(-60), RAD(0), RAD(0));
     mesh2.append_triangle(triangle2)->apply_model_transform(model2)->apply_view_persp_transform(pt2)->apply_viewport_transform(vp)->ready();
 
     renderer.append_mesh(mesh)->append_mesh(mesh2);

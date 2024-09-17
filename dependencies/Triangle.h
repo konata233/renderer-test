@@ -106,14 +106,23 @@ Triangle<T>* Triangle<T>::ready() {
     auto t2 = &this->vertices[2].final;
     this->vec2_2d = vec3t(t2->at_unsafe(0, 0), t2->at_unsafe(0, 1), 0);
 
-    t0 = &this->vertices[0].primary;
+    /*t0 = &this->vertices[0].primary;
     this->vec0_3d = vec3t(t0->at_unsafe(0, 0), t0->at_unsafe(0, 1), t0->at_unsafe(0, 2));
 
     t1 = &this->vertices[1].primary;
     this->vec1_3d = vec3t(t1->at_unsafe(0, 0), t1->at_unsafe(0, 1), t1->at_unsafe(0, 2));
 
     t2 = &this->vertices[2].primary;
-    this->vec2_3d = vec3t(t2->at_unsafe(0, 0), t2->at_unsafe(0, 1), t2->at_unsafe(0, 2));
+    this->vec2_3d = vec3t(t2->at_unsafe(0, 0), t2->at_unsafe(0, 1), t2->at_unsafe(0, 2));*/
+
+    auto t3 = this->vertices[0].pos;
+    this->vec0_3d = vec3t(t3.x, t3.y, t3.z);
+
+    auto t4 = this->vertices[1].pos;
+    this->vec1_3d = vec3t(t4.x, t4.y, t4.z);
+
+    auto t5 = this->vertices[2].pos;
+    this->vec2_3d = vec3t(t5.x, t5.y, t5.z);
 
     return this;
 }
