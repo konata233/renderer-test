@@ -51,17 +51,17 @@ int main() {
     Mesh<float> mesh2 = Mesh(fs2);
 
     auto v = trans_f::view(vec3f(0, 0, 0), vec3f(0, 0, 1), vec3f(0, 1, 0), err);
-    auto f = Transform<float>::frustum(RAD(60), 1, 100, 0.001);
-    auto o = trans_f::orthographic(-1, 1, -1, 1, 1, -1);
+    auto f = Transform<float>::frustum(RAD(60), 1, 100, 0.0001);
+    auto o = trans_f::orthographic(-1, 1, -1, 1, 1, 0.0001);
     auto vp = Transform<float>::viewport(100, 100, 4);
 
     auto pt = f * v;
-    auto model = trans_f::translate(0, 0, 1) * trans_f::rotate(RAD(0), RAD(0), RAD(0));
+    auto model = trans_f::translate(-0.1, 0, 1) * trans_f::rotate(RAD(45), RAD(0), RAD(30));
+    std::cout << (v * model).pretty_print();
     mesh.append_triangle(triangle)->apply_model_transform(model)->apply_view_persp_transform(pt)->apply_viewport_transform(vp)->ready();
 
-    auto pt2 = f * v;
-    auto model2 = trans_f::translate(0, 0, 1) * trans_f::rotate(RAD(-60), RAD(0), RAD(0));
-    mesh2.append_triangle(triangle2)->apply_model_transform(model2)->apply_view_persp_transform(pt2)->apply_viewport_transform(vp)->ready();
+    auto model2 = trans_f::translate(-0.1, 0, 1) * trans_f::rotate(RAD(-45), RAD(20), RAD(0));
+    mesh2.append_triangle(triangle2)->apply_model_transform(model2)->apply_view_persp_transform(pt)->apply_viewport_transform(vp)->ready();
 
     renderer.append_mesh(mesh)->append_mesh(mesh2);
     renderer.render_all();
